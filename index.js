@@ -27,7 +27,6 @@ function supplyDemand(){
 	for(i=0,l=Math.max(buyerValues.length,sellerCosts.length);i<l;++i){
 	    xboth[i]=1+i;
 	}
-	$('#paramPlot'+slot).html('');
 	var demand = {
 	    name: 'unit value',
 	    x: xboth.slice(0,buyerValues.length),
@@ -48,7 +47,7 @@ function supplyDemand(){
     };
 }
 
-module.exports.plotParameters = plotParameters;
+module.exports.supplyDemand = supplyDemand;
 
 function plotFactory(chart){
     /* chart properties are title, log, names, xs, ys, modes, layout */
