@@ -291,11 +291,11 @@ function plotOHLCTimeSeries(){
 
 module.exports.plotOHLCTimeSeries = plotOHLCTimeSeries;
 
-function builder(arrayOfVisuals){
+function build(arrayOfVisuals){
     "use strict";
     return arrayOfVisuals.map(function(visual){
 	return module.exports[visual.f](visual);
     });
 }
 
-module.exports.builder = builder;
+module.exports.build = build;
