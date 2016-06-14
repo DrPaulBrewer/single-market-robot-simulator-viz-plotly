@@ -1,0 +1,28 @@
+{
+  "name": "single-market-robot-simulator-viz-plotly",
+  "version": "0.1.0",
+  "description": "middleware for generating charts with plotly from single-market-robot-simulator simulation logs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drpaulbrewer/single-market-robot-simulator-viz-plotly.git"
+  },
+  "keywords": [
+    "robot-trading",
+    "plot",
+    "trading-visualization"
+  ],
+  "author": "drpaulbrewer@eaftc.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/drpaulbrewer/single-market-robot-simulator-viz-plotly/issues"
+  },
+  "homepage": "https://github.com/drpaulbrewer/single-market-robot-simulator-viz-plotly#readme",
+  "dependencies": {
+    "d3-array": "^0.8.1",
+    "transpluck": "^1.0.2"
+  }
+}
