@@ -9,6 +9,7 @@ const transpluck = require('transpluck');
 module.exports = {};
 
 function yaxisRange(sim){ 
+    "use strict";
     return {
 	yaxis: {
 	    range: [(sim.config.L || 0), (sim.config.H || 200)]
@@ -19,6 +20,7 @@ function yaxisRange(sim){
 module.exports.yaxisRange = yaxisRange;
 
 function supplyDemand(){
+    "use strict";
     return function(sim){
 	var i,l;
 	var xboth=[];
@@ -50,6 +52,7 @@ function supplyDemand(){
 module.exports.supplyDemand = supplyDemand;
 
 function plotFactory(chart){
+    "use strict";
     /* chart properties are title, log, names, xs, ys, modes, layout */
     return function(sim) {
 	var series = transpluck(sim.logs[chart.log].data, { pluck: [].concat(chart.xs,chart.ys) });
@@ -70,6 +73,7 @@ function plotFactory(chart){
 module.exports.plotFactory = plotFactory;
 
 function histogramFactory(chart){
+    "use strict";
     /* req chart properties are title, names, logs, vars */ 
     /* opt chart properties are bins, range */
     return function(sim){ 
@@ -118,6 +122,7 @@ function histogramFactory(chart){
 module.exports.histogramFactory = histogramFactory;
 
 function histogram2DFactory(chart){
+    "use strict";
     /* req chart properties are title, names, logs, vars */
     ['names','logs','vars'].forEach(function(prop){ 
 	if (!Array.isArray(chart[prop]))
@@ -240,6 +245,7 @@ module.exports.histogram2DFactory = histogram2DFactory;
 
 /* private method */
 function prepOHLC(sim){
+    "use strict";
     var series = transpluck(sim.logs.ohlc.data,['period','open','high','low','close']);
     var data = [
 	{
@@ -275,6 +281,7 @@ function prepOHLC(sim){
 }
 
 function plotOHLCTimeSeries(){
+    "use strict";
     return function(sim){
 	var layout = yaxisRange(sim);	
 	var data = prepOHLC(sim);
@@ -285,6 +292,7 @@ function plotOHLCTimeSeries(){
 module.exports.plotOHLCTimeSeries = plotOHLCTimeSeries;
 
 function builder(arrayOfVisuals){
+    "use strict";
     return arrayOfVisuals.map(function(visual){
 	return module.exports[visual.f](visual);
     });
