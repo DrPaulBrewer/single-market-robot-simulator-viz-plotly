@@ -53,7 +53,7 @@ module.exports.supplyDemand = supplyDemand;
 
 function plotFactory(chart){
     "use strict";
-    /* chart properties are title, log, names, xs, ys, modes, layout */
+    /* chart properties are title, logs, names, xs, ys, modes, layout */
     return function(sim) {
 	var series = transpluck(sim.logs[chart.log].data, { pluck: [].concat(chart.xs,chart.ys) });
 	var traces = chart.names.map(function(name,i){
