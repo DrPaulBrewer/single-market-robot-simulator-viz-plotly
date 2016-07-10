@@ -90,13 +90,13 @@ var helpers = exports.helpers = {
     },
     histogramFactory: function histogramFactory(chart) {
 
-        /* req chart properties are title, names, logs, lets */
+        /* req chart properties are title, names, logs, vars */
         /* opt chart properties are bins, range */
 
         return function (sim) {
             var traces = chart.names.map(function (name, i) {
                 var mylog = chart.logs[i % chart.logs.length];
-                var mylet = chart.lets[i % chart.lets.length];
+                var mylet = chart.vars[i % chart.vars.length];
                 return {
                     name: name,
                     x: (0, _transpluck2.default)(sim.logs[mylog].data, { pluck: [mylet] })[mylet],
@@ -140,9 +140,9 @@ var helpers = exports.helpers = {
     },
     histogram2DFactory: function histogram2DFactory(chart) {
 
-        /* req chart properties are title, names, logs, lets */
+        /* req chart properties are title, names, logs, vars */
 
-        ['names', 'logs', 'lets'].forEach(function (prop) {
+        ['names', 'logs', 'vars'].forEach(function (prop) {
             if (!Array.isArray(chart[prop])) throw new Error("histogram2DFactory: Expected array for chart." + prop + " got: " + _typeof(chart[prop]));
             if (chart[prop].length === 0 || chart[prop].length > 2) throw new Error("histogram2DFactory: Expected " + prop + " to be array of length 1 or 2, got: " + chart[prop].length);
         });
@@ -150,7 +150,7 @@ var helpers = exports.helpers = {
         return function (sim) {
             var series = chart.names.map(function (name, i) {
                 var mylog = chart.logs[i % chart.logs.length];
-                var mylet = chart.lets[i % chart.lets.length];
+                var mylet = chart.vars[i % chart.vars.length];
                 return (0, _transpluck2.default)(sim.logs[mylog].data, { pluck: [mylet] })[mylet];
             });
 
