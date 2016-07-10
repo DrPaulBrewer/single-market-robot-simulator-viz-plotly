@@ -12,6 +12,10 @@ export function yaxisRange(sim){
     };  
 }
 
+/* this exports all the functions below, and also assigns them to the helpers object.
+ * It does not export the helpers object because exports are static and not dynamically computed ... which might be counterintuitive.
+ */
+
 export const helpers = {
 
     supplyDemand(){
