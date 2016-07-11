@@ -26,7 +26,7 @@ export const helpers = {
             let buyerValues = sim.config.buyerValues.slice().sort(function(a,b){ return +b-a;});
             let sellerCosts = sim.config.sellerCosts.slice().sort(function(a,b){ return +a-b;});
             for(i=0,l=Math.max(buyerValues.length,sellerCosts.length);i<l;++i){
-                xboth[i]=1+i;
+                xboth[i]=i;
             }
             let demand = {
                 name: 'unit value',
