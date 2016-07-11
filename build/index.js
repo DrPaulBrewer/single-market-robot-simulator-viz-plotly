@@ -19,6 +19,10 @@ var _transpluck = require('transpluck');
 
 var _transpluck2 = _interopRequireDefault(_transpluck);
 
+var _stepifyPlotly = require('stepify-plotly');
+
+var _stepifyPlotly2 = _interopRequireDefault(_stepifyPlotly);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -32,7 +36,7 @@ function yaxisRange(sim) {
 }
 
 /* this exports all the functions below, and also assigns them to the helpers object.
- * It does not export the helpers object because exports are static and not dynamically computed ... which might be counterintuitive.
+ * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
  */
 
 var helpers = exports.helpers = {
@@ -55,17 +59,19 @@ var helpers = exports.helpers = {
                 x: xboth.slice(0, buyerValues.length),
                 y: buyerValues,
                 mode: 'lines+markers',
-                type: 'scatter'
+                type: 'scatter',
+                steps: true
             };
             var supply = {
                 name: 'unit cost',
                 x: xboth.slice(0, sellerCosts.length),
                 y: sellerCosts,
                 mode: 'lines+markers',
-                type: 'scatter'
+                type: 'scatter',
+                steps: true
             };
             var layout = Object.assign({}, yaxisRange(sim), { xaxis: { range: [0, xboth.length] } });
-            var plotlyData = [demand, supply];
+            var plotlyData = [demand, supply].map(_stepifyPlotly2.default);
             return [plotlyData, layout];
         };
     },

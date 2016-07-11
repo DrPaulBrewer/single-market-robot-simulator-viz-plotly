@@ -3,6 +3,7 @@
 
 import * as d3A from 'd3-array';
 import transpluck from 'transpluck';
+import stepify from 'stepify-plotly';
 
 export function yaxisRange(sim){ 
     return {
@@ -13,7 +14,7 @@ export function yaxisRange(sim){
 }
 
 /* this exports all the functions below, and also assigns them to the helpers object.
- * It does not export the helpers object because exports are static and not dynamically computed ... which might be counterintuitive.
+ * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
  */
 
 export const helpers = {
@@ -32,17 +33,19 @@ export const helpers = {
                 x: xboth.slice(0,buyerValues.length),
                 y: buyerValues,
                 mode: 'lines+markers',
-                type: 'scatter'
+                type: 'scatter',
+		steps: true
             };
             let supply = {
                 name: 'unit cost',
                 x: xboth.slice(0,sellerCosts.length),
                 y: sellerCosts,
                 mode: 'lines+markers',
-                type: 'scatter'
+                type: 'scatter',
+		steps: true
             };
             let layout = Object.assign({}, yaxisRange(sim), { xaxis: { range: [0, xboth.length] } } );
-            let plotlyData = [demand, supply];
+            let plotlyData = [demand, supply].map(stepify);
             return [plotlyData, layout];        
         };
     },

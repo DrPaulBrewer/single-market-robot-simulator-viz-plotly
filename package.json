@@ -30,6 +30,7 @@
   "homepage": "https://github.com/drpaulbrewer/single-market-robot-simulator-viz-plotly#readme",
   "dependencies": {
     "d3-array": "^0.8.1",
+    "stepify-plotly": "^1.0.2",
     "transpluck": "^1.0.2"
   },
   "devDependencies": {
