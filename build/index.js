@@ -52,7 +52,7 @@ var helpers = exports.helpers = {
                 return +a - b;
             });
             for (i = 0, l = Math.max(buyerValues.length, sellerCosts.length); i < l; ++i) {
-                xboth[i] = 1 + i;
+                xboth[i] = i;
             }
             var demand = {
                 name: 'unit value',
