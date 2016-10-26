@@ -263,6 +263,8 @@ function build(arrayOfVisuals) {
     var myLibrary = arguments.length <= 1 || arguments[1] === undefined ? helpers : arguments[1];
 
     return arrayOfVisuals.map(function (visual) {
-        return myLibrary[visual.f](visual);
+        var f = myLibrary[visual.f](visual);
+        f.meta = visual;
+        return f;
     });
 }

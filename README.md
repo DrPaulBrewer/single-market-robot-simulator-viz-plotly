@@ -67,15 +67,7 @@ Each element of the `arrayOfVisuals` should have these properties:
 * f:  {String} module function to call to build data-transformation function (i.e. "plotFactory", "histogramFactory", "histogram2DFactory")
 * chart properties appropriate to the function, i.e. title, names, logs, xs, ys, modes, vars, etc.  The chart object is not needed, only the properties.  
 
-
-The builder looks like this:
-
-     module.exports.build = function build(arrayOfVisuals){                                                                                                                                                                                   
-        "use strict";                                                                                                                                                                                                 
-        return arrayOfVisuals.map(function(visual){                                                                                                                                                                   
-            return module.exports[visual.f](visual);                                                                                                                                                                  
-        });                                                                                                                                                                                                           
-     };                  
+The builder returns an array of functions for the visualizations.  The properties are attached to each function in a .meta property.
 
 ###Copyright
 

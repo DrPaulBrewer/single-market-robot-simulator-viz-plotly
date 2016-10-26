@@ -290,7 +290,9 @@ export const helpers = {
 
 export function build(arrayOfVisuals, myLibrary=helpers){
     return arrayOfVisuals.map(function(visual){
-        return myLibrary[visual.f](visual);
+        const f =  myLibrary[visual.f](visual);
+	f.meta = visual;
+	return f;
     });
 }
 
