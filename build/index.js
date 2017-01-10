@@ -263,8 +263,16 @@ function build(arrayOfVisuals) {
     var myLibrary = arguments.length <= 1 || arguments[1] === undefined ? helpers : arguments[1];
 
     return arrayOfVisuals.map(function (visual) {
-        var f = myLibrary[visual.f](visual);
-        f.meta = visual;
-        return f;
+        try {
+            var f = myLibrary[visual.f](visual);
+            if (typeof f !== "function") throw new Error("visualization function named " + visual.f + " does not exist");
+            f.meta = visual;
+            return f;
+        } catch (e) {
+            console.log(e); // eslint-disable-line no-console
+            return undefined;
+        }
+    }).filter(function (visualFunction) {
+        return typeof visualFunction === "function";
     });
 }

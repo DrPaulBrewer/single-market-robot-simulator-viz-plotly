@@ -34,7 +34,7 @@ export const helpers = {
                 y: buyerValues,
                 mode: 'lines+markers',
                 type: 'scatter',
-		steps: true
+                steps: true
             };
             let supply = {
                 name: 'unit cost',
@@ -42,7 +42,7 @@ export const helpers = {
                 y: sellerCosts,
                 mode: 'lines+markers',
                 type: 'scatter',
-		steps: true
+                steps: true
             };
             let layout = Object.assign({}, yaxisRange(sim), { xaxis: { range: [0, xboth.length] } } );
             let plotlyData = [demand, supply].map(stepify);
@@ -290,10 +290,17 @@ export const helpers = {
 
 export function build(arrayOfVisuals, myLibrary=helpers){
     return arrayOfVisuals.map(function(visual){
-        const f =  myLibrary[visual.f](visual);
-	f.meta = visual;
-	return f;
-    });
+        try {
+            let f =  myLibrary[visual.f](visual);
+            if (typeof(f)!=="function")
+                throw new Error("visualization function named "+visual.f+" does not exist");
+            f.meta = visual;
+            return f;
+        } catch(e){
+            console.log(e); // eslint-disable-line no-console
+            return undefined;
+        }
+    }).filter(function(visualFunction){ return typeof(visualFunction)==="function"; });
 }
 
 
