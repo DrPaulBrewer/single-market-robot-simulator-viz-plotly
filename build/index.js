@@ -256,6 +256,41 @@ var helpers = exports.helpers = {
             var data = prepOHLC(sim);
             return [data, layout];
         };
+    },
+    plotBidAskTradeTimeSeries: function plotBidAskTradeTimeSeries() {
+        function prepBAT(sim) {
+            var bidSeries = (0, _transpluck2.default)(sim.logs.buyorder.data, { pluck: ['t', 'buyLimitPrice'] });
+            var askSeries = (0, _transpluck2.default)(sim.logs.sellorder.data, { pluck: ['t', 'sellLimitPrice'] });
+            var tradeSeries = (0, _transpluck2.default)(sim.logs.trade.data, { pluck: ['t', 'price'] });
+
+            var data = [{
+                name: 'bids',
+                x: bidSeries.t,
+                y: bidSeries.buyLimitPrice,
+                type: 'scatter',
+                mode: 'markers'
+            }, {
+                name: 'asks',
+                x: askSeries.t,
+                y: askSeries.sellLimitPrice,
+                type: 'scatter',
+                mode: 'markers'
+            }, {
+                name: 'trades',
+                x: tradeSeries.t,
+                y: tradeSeries.price,
+                type: 'scatter',
+                mode: 'lines+markers'
+            }];
+
+            return data;
+        }
+
+        return function (sim) {
+            var layout = yaxisRange(sim);
+            var data = prepBAT(sim);
+            return [data, layout];
+        };
     }
 };
 

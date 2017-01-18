@@ -285,6 +285,47 @@ export const helpers = {
             let data = prepOHLC(sim);
             return [data, layout];
         };
+    },
+
+    plotBidAskTradeTimeSeries(){
+        function prepBAT(sim){
+            let bidSeries = transpluck(sim.logs.buyorder.data, {pluck: ['t','buyLimitPrice']});
+            let askSeries = transpluck(sim.logs.sellorder.data, {pluck: ['t','sellLimitPrice']});
+            let tradeSeries = transpluck(sim.logs.trade.data, {pluck: ['t','price']});
+
+            let data = [
+                {
+                    name: 'bids',
+                    x: bidSeries.t,
+                    y: bidSeries.buyLimitPrice,
+                    type: 'scatter',
+                    mode: 'markers'
+                },
+                {
+                    name: 'asks',
+                    x: askSeries.t,
+                    y: askSeries.sellLimitPrice,
+                    type: 'scatter',
+                    mode: 'markers'
+                },
+                {
+                    name: 'trades',
+                    x: tradeSeries.t,
+                    y: tradeSeries.price,
+                    type: 'scatter',
+                    mode: 'lines+markers'
+                }       
+            ];
+            
+            return data;
+        }
+
+        return function(sim){
+            let layout = yaxisRange(sim);       
+            let data = prepBAT(sim);
+            return [data, layout];
+        };
+
     }
 };
 
