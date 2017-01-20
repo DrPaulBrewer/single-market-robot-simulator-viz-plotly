@@ -9,6 +9,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 /* This file is open source software.  The MIT License applies to this software. */
 
 exports.yaxisRange = yaxisRange;
+exports.plotFactory = plotFactory;
 exports.build = build;
 
 var _d3Array = require('d3-array');
@@ -38,6 +39,28 @@ function yaxisRange(sim) {
 /* this exports all the functions below, and also assigns them to the helpers object.
  * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
  */
+
+function plotFactory(chart) {
+
+    /* chart properties are title, log or logs, names, xs, ys, modes, layout */
+
+    return function (sim) {
+        var series = null;
+        if (chart.log) series = (0, _transpluck2.default)(sim.logs[chart.log].data, { pluck: [].concat(chart.xs, chart.ys) });
+        var traces = chart.names.map(function (name, i) {
+            var xvar = chart.xs[i % chart.xs.length];
+            var yvar = chart.ys[i % chart.ys.length];
+            var mode = chart.modes[i % chart.modes.length];
+            var type = 'scatter';
+            if (chart.logs) series = (0, _transpluck2.default)(sim.logs[chart.logs[i % chart.logs.length]].data, { pluck: [xvar, yvar] });
+            var x = series[xvar];
+            var y = series[yvar];
+            return { name: name, mode: mode, type: type, x: x, y: y };
+        });
+        var layout = Object.assign({}, { title: chart.title }, yaxisRange(sim), chart.layout);
+        return [traces, layout];
+    };
+}
 
 var helpers = exports.helpers = {
     supplyDemand: function supplyDemand() {
@@ -75,25 +98,10 @@ var helpers = exports.helpers = {
             return [plotlyData, layout];
         };
     },
-    plotFactory: function plotFactory(chart) {
 
-        /* chart properties are title, logs, names, xs, ys, modes, layout */
 
-        return function (sim) {
-            var series = (0, _transpluck2.default)(sim.logs[chart.log].data, { pluck: [].concat(chart.xs, chart.ys) });
-            var traces = chart.names.map(function (name, i) {
-                return {
-                    name: name,
-                    x: series[chart.xs[i % chart.xs.length]],
-                    y: series[chart.ys[i % chart.ys.length]],
-                    type: 'scatter',
-                    mode: chart.modes[i % chart.modes.length]
-                };
-            });
-            var layout = Object.assign({}, { title: chart.title }, yaxisRange(sim), chart.layout);
-            return [traces, layout];
-        };
-    },
+    plotFactory: plotFactory,
+
     histogramFactory: function histogramFactory(chart) {
 
         /* req chart properties are title, names, logs, vars */
@@ -220,77 +228,24 @@ var helpers = exports.helpers = {
         };
     },
     plotOHLCTimeSeries: function plotOHLCTimeSeries() {
-        function prepOHLC(sim) {
-            var series = (0, _transpluck2.default)(sim.logs.ohlc.data, ['period', 'open', 'high', 'low', 'close']);
-            var data = [{
-                name: 'open',
-                x: series.period,
-                y: series.open,
-                type: 'scatter',
-                mode: 'markers'
-            }, {
-                name: 'high',
-                x: series.period,
-                y: series.high,
-                type: 'scatter',
-                mode: 'markers'
-            }, {
-                name: 'low',
-                x: series.period,
-                y: series.low,
-                type: 'scatter',
-                mode: 'markers'
-            }, {
-                name: 'close',
-                x: series.period,
-                y: series.close,
-                type: 'scatter',
-                mode: 'lines+markers'
-            }];
-
-            return data;
-        }
-
-        return function (sim) {
-            var layout = yaxisRange(sim);
-            var data = prepOHLC(sim);
-            return [data, layout];
-        };
+        return plotFactory({
+            title: 'Open,High,Low,Close Trade prices for each period',
+            log: 'ohlc',
+            names: ['open', 'high', 'low', 'close'],
+            xs: ['period'],
+            ys: ['open', 'high', 'low', 'close'],
+            modes: ['markers', 'markers', 'markers', 'lines+markers']
+        });
     },
     plotBidAskTradeTimeSeries: function plotBidAskTradeTimeSeries() {
-        function prepBAT(sim) {
-            var bidSeries = (0, _transpluck2.default)(sim.logs.buyorder.data, { pluck: ['t', 'buyLimitPrice'] });
-            var askSeries = (0, _transpluck2.default)(sim.logs.sellorder.data, { pluck: ['t', 'sellLimitPrice'] });
-            var tradeSeries = (0, _transpluck2.default)(sim.logs.trade.data, { pluck: ['t', 'price'] });
-
-            var data = [{
-                name: 'bids',
-                x: bidSeries.t,
-                y: bidSeries.buyLimitPrice,
-                type: 'scatter',
-                mode: 'markers'
-            }, {
-                name: 'asks',
-                x: askSeries.t,
-                y: askSeries.sellLimitPrice,
-                type: 'scatter',
-                mode: 'markers'
-            }, {
-                name: 'trades',
-                x: tradeSeries.t,
-                y: tradeSeries.price,
-                type: 'scatter',
-                mode: 'lines+markers'
-            }];
-
-            return data;
-        }
-
-        return function (sim) {
-            var layout = yaxisRange(sim);
-            var data = prepBAT(sim);
-            return [data, layout];
-        };
+        return plotFactory({
+            title: 'Bid,Ask,Trade time series',
+            names: ['bids', 'asks', 'trades'],
+            logs: ['buyorder', 'sellorder', 'trade'],
+            modes: ['markers', 'markers', 'lines+markers'],
+            xs: ['t'],
+            ys: ['buyLimitPrice', 'sellLimitPrice', 'price']
+        });
     }
 };
 
