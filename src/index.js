@@ -289,6 +289,9 @@ export const helpers = {
                         y: profitsByAgent[profitHeader[i]],
                         name: profitHeader[i],
                         mode: 'markers',
+                        marker: {
+                            symbol: ((i<sim.numberOfBuyers)? "circle": "square")
+                        },
                         type: 'scatter'
                     }
                 );

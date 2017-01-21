@@ -266,6 +266,9 @@ var helpers = exports.helpers = {
                     y: profitsByAgent[profitHeader[_i3]],
                     name: profitHeader[_i3],
                     mode: 'markers',
+                    marker: {
+                        symbol: _i3 < sim.numberOfBuyers ? "circle" : "square"
+                    },
                     type: 'scatter'
                 });
             }var layout = Object.assign({}, { title: "Profits for each agent and period" }, yaxisRange(sim), chart.layout);
