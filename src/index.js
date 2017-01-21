@@ -271,7 +271,7 @@ export const helpers = {
 
     plotProfitTimeSeries(chart){
         return function(sim) {
-            const numberOfPeriods = sim.logs.profit.length;
+            const numberOfPeriods = sim.logs.profit.data.length;
             const periods = [];
             for(let i=1,l=numberOfPeriods;i<=l;++i)
                 periods.push(i);

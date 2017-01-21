@@ -249,7 +249,7 @@ var helpers = exports.helpers = {
     },
     plotProfitTimeSeries: function plotProfitTimeSeries(chart) {
         return function (sim) {
-            var numberOfPeriods = sim.logs.profit.length;
+            var numberOfPeriods = sim.logs.profit.data.length;
             var periods = [];
             for (var i = 1, l = numberOfPeriods; i <= l; ++i) {
                 periods.push(i);
