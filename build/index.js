@@ -246,6 +246,31 @@ var helpers = exports.helpers = {
             xs: ['t'],
             ys: ['buyLimitPrice', 'sellLimitPrice', 'price']
         });
+    },
+    plotProfitTimeSeries: function plotProfitTimeSeries(chart) {
+        return function (sim) {
+            var numberOfPeriods = sim.logs.profit.length;
+            var periods = [];
+            for (var i = 1, l = numberOfPeriods; i <= l; ++i) {
+                periods.push(i);
+            }var profitHeader = [];
+            for (var _i = 1, _l = sim.numberOfBuyers; _i <= _l; ++_i) {
+                profitHeader.push('Buyer' + _i);
+            }for (var _i2 = 1, _l2 = sim.numberOfSellers; _i2 <= _l2; ++_i2) {
+                profitHeader.push('Seller' + _i2);
+            }var profitsByAgent = (0, _transpluck2.default)(sim.logs.profit, profitHeader);
+            var traces = [];
+            for (var _i3 = 0, _l3 = sim.numberOfAgents; _i3 < _l3; ++_i3) {
+                traces.push({
+                    x: periods,
+                    y: profitsByAgent[profitHeader[_i3]],
+                    name: profitHeader[_i3],
+                    mode: 'markers',
+                    type: 'scatter'
+                });
+            }var layout = Object.assign({}, { title: "Profits for each agent and period" }, yaxisRange(sim), chart.layout);
+            return [traces, layout];
+        };
     }
 };
 

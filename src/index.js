@@ -267,7 +267,35 @@ export const helpers = {
             xs: ['t'],
             ys: ['buyLimitPrice','sellLimitPrice','price']
         });
-    }
+    },
+
+    plotProfitTimeSeries(chart){
+        return function(sim) {
+            const numberOfPeriods = sim.logs.profit.length;
+            const periods = [];
+            for(let i=1,l=numberOfPeriods;i<=l;++i)
+                periods.push(i);
+            const profitHeader = [];
+            for(let i=1,l=sim.numberOfBuyers;i<=l;++i)
+                profitHeader.push('Buyer'+i);
+            for(let i=1,l=sim.numberOfSellers;i<=l;++i)
+                profitHeader.push('Seller'+i);
+            const profitsByAgent = transpluck(sim.logs.profit, profitHeader);
+            const traces = [];
+            for(let i=0,l=sim.numberOfAgents;i<l;++i)
+                traces.push(
+                    {
+                        x: periods,
+                        y: profitsByAgent[profitHeader[i]],
+                        name: profitHeader[i],
+                        mode: 'markers',
+                        type: 'scatter'
+                    }
+                );
+            const layout = Object.assign({}, {title: "Profits for each agent and period"}, yaxisRange(sim), chart.layout);
+            return [traces, layout];
+        };
+    }   
 };
 
 export function build(arrayOfVisuals, myLibrary=helpers){
