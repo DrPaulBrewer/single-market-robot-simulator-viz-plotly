@@ -258,7 +258,7 @@ var helpers = exports.helpers = {
                 profitHeader.push('Buyer' + _i);
             }for (var _i2 = 1, _l2 = sim.numberOfSellers; _i2 <= _l2; ++_i2) {
                 profitHeader.push('Seller' + _i2);
-            }var profitsByAgent = (0, _transpluck2.default)(sim.logs.profit, profitHeader);
+            }var profitsByAgent = (0, _transpluck2.default)(sim.logs.profit.data, profitHeader);
             var traces = [];
             for (var _i3 = 0, _l3 = sim.numberOfAgents; _i3 < _l3; ++_i3) {
                 traces.push({

@@ -280,7 +280,7 @@ export const helpers = {
                 profitHeader.push('Buyer'+i);
             for(let i=1,l=sim.numberOfSellers;i<=l;++i)
                 profitHeader.push('Seller'+i);
-            const profitsByAgent = transpluck(sim.logs.profit, profitHeader);
+            const profitsByAgent = transpluck(sim.logs.profit.data, profitHeader);
             const traces = [];
             for(let i=0,l=sim.numberOfAgents;i<l;++i)
                 traces.push(
