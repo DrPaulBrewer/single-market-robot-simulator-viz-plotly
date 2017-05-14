@@ -40,12 +40,12 @@ export function plotFactory(chart){
             return { name, mode, type, x, y };
         });
         let layout = Object.assign(
-	    {},
-	    clone(defaultLayout),
-	    {title: chart.title},
-	    yaxisRange(sim),
-	    chart.layout
-	);
+            {},
+            clone(defaultLayout),
+            {title: chart.title},
+            yaxisRange(sim),
+            chart.layout
+        );
         return [traces, layout];
     };
 }
@@ -53,8 +53,6 @@ export function plotFactory(chart){
 /* this exports all the functions below, and also assigns them to the helpers object.
  * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
  */
-
-
 
 export const helpers = {
 
@@ -84,15 +82,15 @@ export const helpers = {
                 steps: true
             };
             let layout = Object.assign(
-		{},
-		clone(defaultLayout),
-		yaxisRange(sim),
-		{
-		    xaxis: {
-			range: [0, xboth.length]
-		    }
-		}
-	    );
+                {},
+                clone(defaultLayout),
+                yaxisRange(sim),
+                {
+                    xaxis: {
+                        range: [0, xboth.length]
+                    }
+                }
+            );
             let plotlyData = [demand, supply].map(stepify);
             return [plotlyData, layout];        
         };
@@ -138,16 +136,16 @@ export const helpers = {
             if (mybins && mybins!==100)
                 traces.forEach(function(trace){ trace.nbinsx = mybins; });
             let layout = Object.assign(
-		{},
-		clone(defaultLayout),
-		{
+                {},
+                clone(defaultLayout),
+                {
                     barmode: 'overlay',
                     xaxis: {
-			range: myrange
+                        range: myrange
                     },
                     title: chart.title
-		}
-	    );
+                }
+            );
             return [traces, layout];
         };
     },
@@ -239,7 +237,7 @@ export const helpers = {
 
             let layout = Object.assign(
                 {},
-		defaultLayout,
+                defaultLayout,
                 {
                     title: chart.title,
                     showlegend: false,
@@ -325,12 +323,12 @@ export const helpers = {
                     }
                 );
             const layout = Object.assign(
-		{},
-		defaultLayout,
-		{title: "Profits for each agent and period"},
-		yaxisRange(sim),
-		chart.layout
-	    );
+                {},
+                defaultLayout,
+                {title: "Profits for each agent and period"},
+                yaxisRange(sim),
+                chart.layout
+            );
             return [traces, layout];
         };
     }   

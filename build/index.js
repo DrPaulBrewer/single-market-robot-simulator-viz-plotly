@@ -8,6 +8,7 @@ exports.helpers = undefined;
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; }; /* Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC */
 /* This file is open source software.  The MIT License applies to this software. */
 
+exports.setDefaultLayout = setDefaultLayout;
 exports.yaxisRange = yaxisRange;
 exports.plotFactory = plotFactory;
 exports.build = build;
@@ -24,9 +25,19 @@ var _stepifyPlotly = require('stepify-plotly');
 
 var _stepifyPlotly2 = _interopRequireDefault(_stepifyPlotly);
 
+var _clone = require('clone');
+
+var _clone2 = _interopRequireDefault(_clone);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+var defaultLayout = {};
+
+function setDefaultLayout(layout) {
+    defaultLayout = (0, _clone2.default)(layout);
+}
 
 function yaxisRange(sim) {
     return {
@@ -35,10 +46,6 @@ function yaxisRange(sim) {
         }
     };
 }
-
-/* this exports all the functions below, and also assigns them to the helpers object.
- * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
- */
 
 function plotFactory(chart) {
 
@@ -57,10 +64,14 @@ function plotFactory(chart) {
             var y = series[yvar];
             return { name: name, mode: mode, type: type, x: x, y: y };
         });
-        var layout = Object.assign({}, { title: chart.title }, yaxisRange(sim), chart.layout);
+        var layout = Object.assign({}, (0, _clone2.default)(defaultLayout), { title: chart.title }, yaxisRange(sim), chart.layout);
         return [traces, layout];
     };
 }
+
+/* this exports all the functions below, and also assigns them to the helpers object.
+ * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
+ */
 
 var helpers = exports.helpers = {
     supplyDemand: function supplyDemand() {
@@ -93,7 +104,11 @@ var helpers = exports.helpers = {
                 type: 'scatter',
                 steps: true
             };
-            var layout = Object.assign({}, yaxisRange(sim), { xaxis: { range: [0, xboth.length] } });
+            var layout = Object.assign({}, (0, _clone2.default)(defaultLayout), yaxisRange(sim), {
+                xaxis: {
+                    range: [0, xboth.length]
+                }
+            });
             var plotlyData = [demand, supply].map(_stepifyPlotly2.default);
             return [plotlyData, layout];
         };
@@ -142,13 +157,13 @@ var helpers = exports.helpers = {
             if (mybins && mybins !== 100) traces.forEach(function (trace) {
                 trace.nbinsx = mybins;
             });
-            var layout = {
+            var layout = Object.assign({}, (0, _clone2.default)(defaultLayout), {
                 barmode: 'overlay',
                 xaxis: {
                     range: myrange
                 },
                 title: chart.title
-            };
+            });
             return [traces, layout];
         };
     },
@@ -212,7 +227,7 @@ var helpers = exports.helpers = {
                 zeroline: false
             }, chart.axiscommon);
 
-            var layout = Object.assign({}, {
+            var layout = Object.assign({}, defaultLayout, {
                 title: chart.title,
                 showlegend: false,
                 margin: { t: 50 },
@@ -271,7 +286,7 @@ var helpers = exports.helpers = {
                     },
                     type: 'scatter'
                 });
-            }var layout = Object.assign({}, { title: "Profits for each agent and period" }, yaxisRange(sim), chart.layout);
+            }var layout = Object.assign({}, defaultLayout, { title: "Profits for each agent and period" }, yaxisRange(sim), chart.layout);
             return [traces, layout];
         };
     }
