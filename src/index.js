@@ -280,7 +280,7 @@ export const helpers = {
             log: 'ohlc',
             names: ['open','high','low','close'],
             xs: ['period'],
-            ys: ['open','high','low','close'],
+            ys: ['openPrice','highPrice','lowPrice','closePrice'],
             modes: ['markers','markers','markers','lines+markers']
         });
     },
