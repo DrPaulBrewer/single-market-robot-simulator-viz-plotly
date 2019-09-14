@@ -9,6 +9,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 /* This file is open source software.  The MIT License applies to this software. */
 
 exports.setDefaultLayout = setDefaultLayout;
+exports.setSampleSize = setSampleSize;
+exports.getSampleSize = getSampleSize;
 exports.yaxisRange = yaxisRange;
 exports.plotFactory = plotFactory;
 exports.build = build;
@@ -29,14 +31,38 @@ var _clone = require('clone');
 
 var _clone2 = _interopRequireDefault(_clone);
 
+var _randomJs = require('random-js');
+
+var Random = _interopRequireWildcard(_randomJs);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 var defaultLayout = {};
 
+var MT = Random.MersenneTwister19937.autoSeed();
+
 function setDefaultLayout(layout) {
     defaultLayout = (0, _clone2.default)(layout);
+}
+
+var sampleSize = +Infinity;
+
+function setSampleSize(newsize) {
+    sampleSize = newsize;
+    return sampleSize;
+}
+
+function getSampleSize() {
+    return sampleSize;
+}
+
+function sample(data) {
+    if (data.length - 1 <= sampleSize) return data;
+    var sampledData = Random.sample(MT, data.slice(1), sampleSize);
+    sampledData.unshift(data[0].slice());
+    return sampledData;
 }
 
 function yaxisRange(sim) {
@@ -53,13 +79,13 @@ function plotFactory(chart) {
 
     return function (sim) {
         var series = null;
-        if (chart.log) series = (0, _transpluck2.default)(sim.logs[chart.log].data, { pluck: [].concat(chart.xs, chart.ys) });
+        if (chart.log) series = (0, _transpluck2.default)(sample(sim.logs[chart.log].data), { pluck: [].concat(chart.xs, chart.ys) });
         var traces = chart.names.map(function (name, i) {
             var xvar = chart.xs[i % chart.xs.length];
             var yvar = chart.ys[i % chart.ys.length];
             var mode = chart.modes[i % chart.modes.length];
             var type = 'scatter';
-            if (chart.logs) series = (0, _transpluck2.default)(sim.logs[chart.logs[i % chart.logs.length]].data, { pluck: [xvar, yvar] });
+            if (chart.logs) series = (0, _transpluck2.default)(sample(sim.logs[chart.logs[i % chart.logs.length]].data), { pluck: [xvar, yvar] });
             var x = series[xvar];
             var y = series[yvar];
             return { name: name, mode: mode, type: type, x: x, y: y };
@@ -128,7 +154,7 @@ var helpers = exports.helpers = {
                 var mylet = chart.vars[i % chart.vars.length];
                 return {
                     name: name,
-                    x: (0, _transpluck2.default)(sim.logs[mylog].data, { pluck: [mylet] })[mylet],
+                    x: (0, _transpluck2.default)(sample(sim.logs[mylog].data), { pluck: [mylet] })[mylet],
                     type: 'histogram',
                     opacity: 0.60,
                     nbinsx: 100
@@ -180,7 +206,7 @@ var helpers = exports.helpers = {
             var series = chart.names.map(function (name, i) {
                 var mylog = chart.logs[i % chart.logs.length];
                 var mylet = chart.vars[i % chart.vars.length];
-                return (0, _transpluck2.default)(sim.logs[mylog].data, { pluck: [mylet] })[mylet];
+                return (0, _transpluck2.default)(sample(sim.logs[mylog].data), { pluck: [mylet] })[mylet];
             });
 
             var points = Object.assign({}, {
