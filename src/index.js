@@ -5,38 +5,59 @@ import * as d3A from 'd3-array';
 import transpluck from 'transpluck';
 import stepify from 'stepify-plotly';
 import clone from 'clone';
-
+import * as Random from 'random-js';
 let defaultLayout = {};
+
+const MT = Random.MersenneTwister19937.autoSeed();
 
 export function setDefaultLayout(layout){
     defaultLayout = clone(layout);
 }
 
-export function yaxisRange(sim){ 
+let sampleSize = +Infinity;
+
+export function setSampleSize(newsize){
+  sampleSize = newsize;
+  return sampleSize;
+}
+
+export function getSampleSize(){
+  return sampleSize;
+}
+
+function sample(data){
+  if ((data.length-1) <= sampleSize)
+    return data;
+  const sampledData = Random.sample(MT, data.slice(1), sampleSize);
+  sampledData.unshift(data[0].slice());
+  return sampledData;
+}
+
+export function yaxisRange(sim){
     return {
         yaxis: {
             range: [(sim.config.L || 0), (sim.config.H || 200)]
         }
-    };  
+    };
 }
 
 export function plotFactory(chart){
-    
+
     /* chart properties are title, log or logs, names, xs, ys, modes, layout */
 
     return function(sim) {
         let series = null;
         if (chart.log)
-            series = transpluck(sim.logs[chart.log].data, {pluck: [].concat(chart.xs,chart.ys)});
+            series = transpluck(sample(sim.logs[chart.log].data), {pluck: [].concat(chart.xs,chart.ys)});
         const traces = chart.names.map(function(name,i){
             const xvar = chart.xs[i%chart.xs.length];
             const yvar = chart.ys[i%chart.ys.length];
             const mode = chart.modes[i%chart.modes.length];
             const type = 'scatter';
             if (chart.logs)
-                series = transpluck(sim.logs[chart.logs[i%chart.logs.length]].data, { pluck: [xvar,yvar] });
+                series = transpluck(sample(sim.logs[chart.logs[i%chart.logs.length]].data), { pluck: [xvar,yvar] });
             const x = series[xvar];
-            const y = series[yvar];         
+            const y = series[yvar];
             return { name, mode, type, x, y };
         });
         let layout = Object.assign(
@@ -92,7 +113,7 @@ export const helpers = {
                 }
             );
             let plotlyData = [demand, supply].map(stepify);
-            return [plotlyData, layout];        
+            return [plotlyData, layout];
         };
     },
 
@@ -100,27 +121,27 @@ export const helpers = {
 
     histogramFactory(chart){
 
-        /* req chart properties are title, names, logs, vars */ 
+        /* req chart properties are title, names, logs, vars */
         /* opt chart properties are bins, range */
 
-        return function(sim){ 
+        return function(sim){
             let traces = chart.names.map(function(name,i){
                 let mylog = chart.logs[i%chart.logs.length];
                 let mylet = chart.vars[i%chart.vars.length];
                 return {
                     name,
-                    x: transpluck(sim.logs[mylog].data, {pluck: [mylet]})[mylet],
+                    x: transpluck(sample(sim.logs[mylog].data), {pluck: [mylet]})[mylet],
                     type: 'histogram',
                     opacity:  0.60,
                     nbinsx: 100
                 };
             });
             let myrange, mybins;
-            let mymin,mymax; 
-            if (chart.range){ 
+            let mymin,mymax;
+            if (chart.range){
                 myrange = chart.range;
             } else {
-                mymin = d3A.min(traces, function(trace){ 
+                mymin = d3A.min(traces, function(trace){
                     return d3A.min(trace.x);
                 });
                 mymax = d3A.max(traces, function(trace){
@@ -128,7 +149,7 @@ export const helpers = {
                 });
                 myrange = [mymin, mymax];
             }
-            if (chart.bins) { 
+            if (chart.bins) {
                 mybins = chart.bins;
             } else {
                 mybins = Math.max(0, Math.min(200, Math.floor(1+mymax-mymin)));
@@ -155,7 +176,7 @@ export const helpers = {
 
         /* req chart properties are title, names, logs, vars */
 
-        ['names','logs','vars'].forEach(function(prop){ 
+        ['names','logs','vars'].forEach(function(prop){
             if (!Array.isArray(chart[prop]))
                 throw new Error("histogram2DFactory: Expected array for chart."+prop+" got: "+typeof(chart[prop]));
             if ((chart[prop].length===0) || (chart[prop].length>2))
@@ -166,7 +187,7 @@ export const helpers = {
             let series = chart.names.map(function(name,i){
                 let mylog = chart.logs[i%chart.logs.length];
                 let mylet = chart.vars[i%chart.vars.length];
-                return transpluck(sim.logs[mylog].data, 
+                return transpluck(sample(sim.logs[mylog].data),
                                   {pluck: [mylet]})[mylet];
             });
 
@@ -185,7 +206,7 @@ export const helpers = {
                 },
                 chart.points
             );
-            
+
 
             let density = Object.assign(
                 {},
@@ -201,7 +222,7 @@ export const helpers = {
                 },
                 chart.density
             );
-            
+
             let upper = Object.assign(
                 {},
                 {
@@ -213,7 +234,7 @@ export const helpers = {
                 },
                 chart.upper
             );
-            
+
             let right = Object.assign(
                 {},
                 {
@@ -225,7 +246,7 @@ export const helpers = {
                 },
                 chart.right
             );
-            
+
             let axiscommon = Object.assign(
                 {},
                 {
@@ -331,7 +352,7 @@ export const helpers = {
             );
             return [traces, layout];
         };
-    }   
+    }
 };
 
 export function build(arrayOfVisuals, myLibrary=helpers){
@@ -348,5 +369,3 @@ export function build(arrayOfVisuals, myLibrary=helpers){
         }
     }).filter(function(visualFunction){ return typeof(visualFunction)==="function"; });
 }
-
-
