@@ -119,6 +119,28 @@ export const helpers = {
 
     plotFactory,
 
+    boxplotFactory(chart){
+      // requires log, y, input='study'
+      
+      return function(sims){
+        if (!Array.isArray(sims))
+          throw new Error("boxplot requires an array of multiple simulations");
+        const data = sims.map((sim,j)=>{
+          const y = transpluck(sample(sim.logs[chart.log].data), {pluck: [chart.y]})[chart.y];
+          return {
+            y,
+            name: sim.config.name || sim.config.caseid || sim.caseid || (''+j),
+            type: 'box',
+            boxmean: 'sd'
+          };
+        });
+        const layout = {
+          title: 'box plot for '+chart.log+'.'+chart.y
+        };
+        return [data,layout];
+      };
+    },
+
     histogramFactory(chart){
 
         /* req chart properties are title, names, logs, vars */
