@@ -164,6 +164,29 @@ var helpers = exports.helpers = {
             return [data, layout];
         };
     },
+    violinFactory: function violinFactory(chart) {
+        // requires log, y, input='study'
+
+        return function (sims) {
+            if (!Array.isArray(sims)) throw new Error("violin requires an array of multiple simulations");
+            var data = sims.map(function (sim, j) {
+                var y = (0, _transpluck2.default)(sample(sim.logs[chart.log].data), { pluck: [chart.y] })[chart.y];
+                return {
+                    y: y,
+                    name: sim.config.name || sim.config.caseid || sim.caseid || '' + j,
+                    type: 'violin',
+                    meanline: {
+                        visible: true
+                    },
+                    showlegend: false
+                };
+            });
+            var layout = {
+                title: 'violin plot for ' + chart.log + '.' + chart.y
+            };
+            return [data, layout];
+        };
+    },
     histogramFactory: function histogramFactory(chart) {
 
         /* req chart properties are title, names, logs, vars */
