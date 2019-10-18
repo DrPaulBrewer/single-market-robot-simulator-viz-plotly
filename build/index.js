@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.helpers = undefined;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; }; /* Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC */
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC */
 /* This file is open source software.  The MIT License applies to this software. */
 
 exports.setDefaultLayout = setDefaultLayout;
@@ -363,7 +363,7 @@ var helpers = exports.helpers = {
 };
 
 function build(arrayOfVisuals) {
-    var myLibrary = arguments.length <= 1 || arguments[1] === undefined ? helpers : arguments[1];
+    var myLibrary = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : helpers;
 
     return arrayOfVisuals.map(function (visual) {
         try {
