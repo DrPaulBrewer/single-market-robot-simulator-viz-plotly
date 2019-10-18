@@ -121,7 +121,7 @@ export const helpers = {
 
     boxplotFactory(chart){
       // requires log, y, input='study'
-      
+
       return function(sims){
         if (!Array.isArray(sims))
           throw new Error("boxplot requires an array of multiple simulations");
@@ -131,7 +131,8 @@ export const helpers = {
             y,
             name: sim.config.name || sim.config.caseid || sim.caseid || (''+j),
             type: 'box',
-            boxmean: 'sd'
+            boxmean: 'sd',
+            showlegend: false
           };
         });
         const layout = {
