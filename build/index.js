@@ -154,7 +154,8 @@ var helpers = exports.helpers = {
                     y: y,
                     name: sim.config.name || sim.config.caseid || sim.caseid || '' + j,
                     type: 'box',
-                    boxmean: 'sd'
+                    boxmean: 'sd',
+                    showlegend: false
                 };
             });
             var layout = {
