@@ -5,10 +5,9 @@
   "main": "build/index.js",
   "scripts": {
     "clean": "rm -rf ./build ./doc ; mkdir ./build",
-    "build": "node_modules/.bin/babel build src/index.js -o build/index.js",
+    "build": "babel build src/index.js -o build/index.js",
     "doc": "node_modules/.bin/esdoc -c esdoc.json",
     "lint": "node_modules/.bin/eslint src/index.js",
-    "cover": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -u exports --compilers js:babel-register --timeout 60000",
     "go": "npm run clean && npm run lint && npm run build"
   },
   "repository": {
@@ -27,21 +26,18 @@
   },
   "homepage": "https://github.com/drpaulbrewer/single-market-robot-simulator-viz-plotly#readme",
   "dependencies": {
-    "d3-array": "^2.3.3",
+    "d3-array": "^2.4.0",
     "stepify-plotly": "^1.0.6",
     "transpluck": "^1.0.4"
   },
   "devDependencies": {
-    "babel": "^6.23.0",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-preset-es2015": "^6.24.1",
-    "coveralls": "^3.0.7",
+    "@babel/cli": "^7.8.3",
+    "@babel/core": "^7.8.3",
+    "@babel/polyfill": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/register": "^7.8.3",
     "esdoc": "^1.1.0",
-    "eslint": "^6.5.1",
-    "istanbul": "^1.0.0-alpha.2",
-    "mocha": "^6.2.1",
-    "should": "^13.2.3"
+    "eslint": "^6.8.0"
   },
   "jsnext:main": "src/index.js"
 }
