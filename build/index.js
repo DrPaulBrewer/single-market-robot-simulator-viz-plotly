@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.setDefaultLayout = setDefaultLayout;
 exports.setSampleSize = setSampleSize;
 exports.getSampleSize = getSampleSize;
-exports.setLogFilter = setLogFilter;
+exports.setFilter = setFilter;
 exports.getFilter = getFilter;
 exports.yaxisRange = yaxisRange;
 exports.plotFactory = plotFactory;
@@ -51,7 +51,7 @@ function getSampleSize() {
 
 var logFilter = null;
 
-function setLogFilter(newFilter) {
+function setFilter(newFilter) {
   logFilter = newFilter;
   return logFilter;
 }

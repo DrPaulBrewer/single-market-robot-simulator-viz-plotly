@@ -26,7 +26,7 @@ export function getSampleSize() {
 }
 
 let logFilter = null;
-export function setLogFilter(newFilter){
+export function setFilter(newFilter){
   logFilter = newFilter;
   return logFilter;
 }
