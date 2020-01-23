@@ -68,16 +68,30 @@ export function plotFactory(chart) {
     if (chart.log)
       series = transpluck(extract(sim.logs[chart.log]), { pluck: [].concat(chart.xs, chart.ys) });
     const traces = chart.names.map(function (name, i) {
-      const xvar = chart.xs[i % chart.xs.length];
-      const yvar = chart.ys[i % chart.ys.length];
-      const mode = chart.modes[i % chart.modes.length];
-      const logName = Array.isArray(chart.logs) && (chart.logs[i % chart.logs.length]);
       const type = 'scatter';
-      if (logName){
-        series = transpluck(extract(sim.logs[logName]), { pluck: [xvar, yvar] });
+      const mode = chart.modes[i % chart.modes.length];
+      let x = [], y=[];
+      try {
+        const xvar = chart.xs[i % chart.xs.length];
+        const yvar = chart.ys[i % chart.ys.length];
+        const logName = Array.isArray(chart.logs) && (chart.logs[i % chart.logs.length]);
+        if (logName){
+          series = transpluck(extract(sim.logs[logName]), { pluck: [xvar, yvar] });
+        }
+        x = series[xvar];
+        y = series[yvar];
+        if (!Array.isArray(x))
+          x = [];
+        if (!Array.isArray(y))
+          y = [];
+        if (x.length!==y.length)
+          throw new Error("plotFactory: x and y series are of unequal length");
+      } catch(e){
+        console.log("plotFactory: error, no data for "+name+" chart "+i);
+        console.log(e);
+        x = [];
+        y = [];
       }
-      const x = series[xvar];
-      const y = series[yvar];
       return { name, mode, type, x, y };
     });
     let layout = Object.assign({},
@@ -142,7 +156,14 @@ export const helpers = {
       if (!Array.isArray(sims))
         throw new Error("boxplot requires an array of multiple simulations");
       const data = sims.map((sim, j) => {
-        const y = transpluck(extract(sim.logs[chart.log]), { pluck: [chart.y] })[chart.y];
+        let y = [];
+        try {
+          y = transpluck(extract(sim.logs[chart.log]), { pluck: [chart.y] })[chart.y];
+        } catch(e){
+          y = [];
+          console.log("boxplotFactory: error, no data for simulation "+j);
+          console.log(e);
+        }
         return {
           y,
           name: sim.config.name || sim.config.caseid || sim.caseid || ('' + j),
@@ -165,7 +186,14 @@ export const helpers = {
       if (!Array.isArray(sims))
         throw new Error("violin requires an array of multiple simulations");
       const data = sims.map((sim, j) => {
-        const y = transpluck(extract(sim.logs[chart.log]), { pluck: [chart.y] })[chart.y];
+        let y = [];
+        try {
+          y = transpluck(extract(sim.logs[chart.log]), { pluck: [chart.y] })[chart.y];
+        } catch(e){
+          y = [];
+          console.log("violinFactory: error, no data for simulation "+j);
+          console.log(e);
+        }
         return {
           y,
           name: sim.config.name || sim.config.caseid || sim.caseid || ('' + j),
@@ -193,9 +221,17 @@ export const helpers = {
       let traces = chart.names.map(function (name, i) {
         let mylog = chart.logs[i % chart.logs.length];
         let mylet = chart.vars[i % chart.vars.length];
+        let x = [];
+        try {
+          x = transpluck(extract(sim.logs[mylog]), { pluck: [mylet] })[mylet];
+        } catch(e){
+          x = [];
+          console.log("histogramFactory: error, no data for "+name+" chart "+i);
+          console.log(e);
+        }
         return {
           name,
-          x: transpluck(extract(sim.logs[mylog]), { pluck: [mylet] })[mylet],
+          x,
           type: 'histogram',
           opacity: 0.60,
           nbinsx: 100
@@ -247,11 +283,18 @@ export const helpers = {
     });
 
     return function (sim) {
-      let series = chart.names.map(function (name, i) {
-        let mylog = chart.logs[i % chart.logs.length];
-        let mylet = chart.vars[i % chart.vars.length];
-        return transpluck(extract(sim.logs[mylog]), { pluck: [mylet] })[mylet];
-      });
+      let series = [[],[]];
+      try {
+        series = chart.names.map(function (name, i) {
+          let mylog = chart.logs[i % chart.logs.length];
+          let mylet = chart.vars[i % chart.vars.length];
+          return transpluck(extract(sim.logs[mylog]), { pluck: [mylet] })[mylet];
+        });
+      } catch(e){
+        console.log("histogram2DFactory: error, no data");
+        console.log(e);
+        series = [[],[]];
+      }
 
       let points = Object.assign({}, {
           x: series[0],
