@@ -1,4 +1,4 @@
-/* Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC */
+/* Copyright 2016- Paul Brewer, Economic and Financial Technology Consulting LLC */
 /* This file is open source software.  The MIT License applies to this software. */
 
 import * as d3A from 'd3-array';
@@ -6,6 +6,7 @@ import transpluck from 'transpluck';
 import stepify from 'stepify-plotly';
 import clone from 'clone';
 import * as Random from 'random-js';
+import crossSingleUnitSupplyAndDemand from 'market-pricing';
 let defaultLayout = {};
 
 const MT = Random.MersenneTwister19937.autoSeed();
@@ -51,11 +52,13 @@ function extract(log){
   return sample(data);
 }
 
-export function yaxisRange(sim) {
+export function yaxisRange(sim, axisOptions={}) {
   return {
-    yaxis: {
-      range: [(sim.config.L || 0), (sim.config.H || 200)]
-    }
+    yaxis: Object.assign(
+      {},
+      axisOptions,
+      { range: [(sim.config.L || 0), (sim.config.H || 200)] }
+    )
   };
 }
 
@@ -111,35 +114,80 @@ export const helpers = {
 
   supplyDemand() {
     return function (sim) {
-      let i, l;
-      let xboth = [];
-      let buyerValues = sim.config.buyerValues.slice().sort(function (a, b) { return +b - a; });
-      let sellerCosts = sim.config.sellerCosts.slice().sort(function (a, b) { return +a - b; });
-      for (i=0,l=Math.max(buyerValues.length, sellerCosts.length);i<l;++i) {
-        xboth[i] = i;
+      const demandValues = sim.config.buyerValues.slice().sort(function (a, b) { return +b - a; });
+      const supplyCosts = sim.config.sellerCosts.slice().sort(function (a, b) { return +a - b; });
+      if (demandValues[demandValues.length-1]>0){
+        demandValues.push(0);
       }
+      const h = sim.config.h || 200;
+      if (supplyCosts[supplyCosts.length-1]<=h){
+        supplyCosts.push(h+1);
+      }
+      const ceModel = crossSingleUnitSupplyAndDemand(demandValues,supplyCosts);
+      const ceResult = (ceModel && ceModel.p && ceModel.q)? ('CE: '+JSON.stringify(ceModel)): '';
+      const maxlen = Math.max(demandValues.length, supplyCosts.length);
+      const minlen = Math.min(demandValues.length, supplyCosts.length);
+      const steps = (maxlen<=30);
+      const mode = (maxlen<=30)? 'lines+markers' : 'markers';
+      const type = 'scatter';
+      const cutoff = Math.min(minlen+10,maxlen);
+      const idxStep = Math.max(1,Math.ceil(minlen/50));
+      const xD=[],yD=[],xS=[],yS=[];
+      function include(i){
+        if (i<0) return;
+        if(i<demandValues.length){
+          xD.push(i+1);
+          yD.push(demandValues[i]);
+        }
+        if(i<supplyCosts.length){
+          xS.push(i+1);
+          yS.push(supplyCosts[i]);
+        }
+      }
+      let q0,q1;
+      if (Array.isArray(ceModel.q)){
+        [q0,q1] = ceModel.q;
+      } else if (+ceModel.q>0){
+          q0=ceModel.q;
+          q1=q0+1;
+      } else {
+        q0=0;
+        q1=1;
+      }
+      for(let i=0,l=q0-1;i<l;i+=idxStep)
+        include(i);
+      for(let i=q0-1,l=q1-1;i<l;i+=Math.min(q1-q0,idxStep))
+        include(i);
+      for (let i=q1-1,l=cutoff;i<l;i+=Math.min(cutoff-q1,idxStep))
+        include(i);
+
       let demand = {
-        name: 'unit value',
-        x: xboth.slice(0, buyerValues.length),
-        y: buyerValues,
-        mode: 'lines+markers',
-        type: 'scatter',
-        steps: true
+        name: 'demand',
+        x: xD,
+        y: yD,
+        mode,
+        type,
+        steps
       };
       let supply = {
-        name: 'unit cost',
-        x: xboth.slice(0, sellerCosts.length),
-        y: sellerCosts,
-        mode: 'lines+markers',
-        type: 'scatter',
-        steps: true
+        name: 'supply',
+        x: xS,
+        y: yS,
+        mode,
+        type,
+        steps
       };
       let layout = Object.assign({},
         clone(defaultLayout),
-        yaxisRange(sim), {
+        yaxisRange(sim, {
+          title: 'P'
+        }),
+        {
           xaxis: {
-            range: [0, xboth.length]
-          }
+            range: [0, cutoff+1],
+            title: "Q"
+          },
+          title: "Case "+sim.config.caseid+" S/D Model <br><sub>"+ceResult+"</sub>"
         }
       );
       let plotlyData = [demand, supply].map(stepify);
