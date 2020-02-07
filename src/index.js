@@ -1,12 +1,132 @@
 /* Copyright 2016- Paul Brewer, Economic and Financial Technology Consulting LLC */
 /* This file is open source software.  The MIT License applies to this software. */
 
+/* global Plotly: true */
+
+/* eslint consistent-this: ["error", "app", "that"] */
+
 import * as d3A from 'd3-array';
 import transpluck from 'transpluck';
 import stepify from 'stepify-plotly';
 import clone from 'clone';
 import * as Random from 'random-js';
 import crossSingleUnitSupplyAndDemand from 'market-pricing';
+
+export class PlotlyDataLayoutConfig {
+  constructor(options){
+    this.data = options.data || [];
+    this.layout = options.layout || {};
+    this.config = options.config || {};
+    this.setInteractivity(options.isInteractive);
+    if (options.title){
+      this.adjustTitle(options.title);
+    }
+  }
+
+  /**
+   * Set Plotly interactivity based on #useInteractiveCharts checkbox
+   * @param {[boolean]} interactive optional, if undefined taken from $('#useInteractiveCharts')
+   */
+
+  setInteractivity(isInteractive=false){
+    const config = this.config;
+    config.staticPlot = !isInteractive;
+    config.displayModeBar = isInteractive;
+    config.showSendToCloud = isInteractive;
+    return this;
+  }
+
+/**
+ * Change Plotly plot title by prepending, appending, or replacing existing plot title
+ * @param {{prepend: ?string, append: ?string, replace: ?string}} modifier modifications to title
+ */
+
+  adjustTitle(modifier){
+    const layout = this.layout;
+    if (modifier.replace && (modifier.replace.length > 0))
+      layout.title = modifier.replace;
+    if (layout.title) {
+      if (modifier.prepend && (modifier.prepend.length > 0))
+        layout.title = modifier.prepend + layout.title;
+      if (modifier.append && (modifier.append.length > 0))
+        layout.title += modifier.append;
+    }
+    return this;
+  }
+}
+
+function extractNestedConfig(sim, starter){
+  const result = {};
+  if (sim && sim.config){
+    const titleKeys = Object.keys(sim.config).filter((k)=>(k.startsWith(starter)));
+    titleKeys.forEach((k)=>{
+      const withoutStarter = k.slice(starter.length);
+      const newKey = withoutStarter[0].toLowerCase()+withoutStarter.slice(1);
+      result[newKey] = sim.config[k];
+    });
+  }
+  return result;
+}
+
+export class Visualization extends PlotlyDataLayoutConfig {
+  show(div){
+    Plotly.react(div,this.data,this.layout,this.config);
+    return this;
+  }
+}
+
+export class VisualizationFactory  {
+  constructor(spec){
+    // Legacy compatibility
+    this.meta = spec;
+    this.loader = helpers[spec.f](spec); // eslint-disable-line no-use-before-define
+    // Plotly default settings
+    // this.data not initialized here
+    this.layout = {};
+    this.config = {
+      responsive: true,
+      displaylogo: false
+    };
+  }
+
+  load(options){
+    const { from, to, title, isInteractive } = options;
+    if (!from) throw new Error("no data source for VisualizationFactory.load");
+    if (!Array.isArray(from) && (this.meta.input==='study')){
+      throw new Error("this visualization requires an array of simulations");
+    }
+    if (Array.isArray(from) && (this.meta.input!=='study')){
+      const arrayOfVisualizations = [];
+      from.forEach((sim,j)=>{
+        // recursive call with single sim and div with appended index
+        const loadedVizForThisSim = this.load({
+          from: sim,
+          to: to+j,
+          title,
+          isInteractive
+        });
+        arrayOfVisualizations.push(loadedVizForThisSim);
+      });
+      return arrayOfVisualizations;
+    }
+    // the loaders were written first; adapt their output
+    // from triplet array format to object property format
+    const [data,_layout,_config] = this.loader(from);
+    const layout = Object.assign({}, clone(this.layout), clone(_layout));
+    const config = Object.assign({}, clone(this.config), clone(_config));
+    const v =  new Visualization({ data, layout, config});
+    v.setInteractivity(isInteractive);
+    if (title){
+      v.adjustTitle(title);
+    } else if (from && from.config){
+      const simTitleModifier = extractNestedConfig(from, 'title');
+      v.adjustTitle(simTitleModifier);
+    }
+    if (to) return v.show(to);
+    return v;
+  }
+}
+
 let defaultLayout = {};
 
 const MT = Random.MersenneTwister19937.autoSeed();
@@ -62,6 +182,10 @@ export function yaxisRange(sim, axisOptions={}) {
   };
 }
 
+export function chartTitle(suggested,sim){
+  return suggested+"<br>case: "+sim.config.caseid;
+}
+
 export function plotFactory(chart) {
 
   /* chart properties are title, log or logs, names, xs, ys, modes, layout */
@@ -98,7 +222,7 @@ export function plotFactory(chart) {
       return { name, mode, type, x, y };
     });
     let layout = Object.assign({},
-      clone(defaultLayout), { title: chart.title },
+      clone(defaultLayout), { title: chartTitle(chart.title, sim) },
       yaxisRange(sim),
       chart.layout
     );
@@ -187,7 +311,7 @@ export const helpers = {
             range: [0, cutoff+1],
             title: "Q"
           },
-          title: "Case "+sim.config.caseid+" S/D Model <br><sub>"+ceResult+"</sub>"
+          title: " S/D Model <br>Case "+sim.config.caseid+"<br><sub>"+ceResult+"</sub>"
         }
       );
       let plotlyData = [demand, supply].map(stepify);
@@ -212,9 +336,10 @@ export const helpers = {
           console.log("boxplotFactory: error, no data for simulation "+j);
           console.log(e);
         }
+        const name = ''+sim.config.caseid;
         return {
           y,
-          name: sim.config.name || sim.config.caseid || sim.caseid || ('' + j),
+          name,
           type: 'box',
           boxmean: 'sd',
           showlegend: false
@@ -242,9 +367,10 @@ export const helpers = {
           console.log("violinFactory: error, no data for simulation "+j);
           console.log(e);
         }
+        const name = ''+sim.config.caseid;
         return {
           y,
-          name: sim.config.name || sim.config.caseid || sim.caseid || ('' + j),
+          name,
           type: 'violin',
           meanline: {
             visible: true
@@ -311,7 +437,7 @@ export const helpers = {
           xaxis: {
             range: myrange
           },
-          title: chart.title
+          title: chartTitle(chart.title,sim)
         }
       );
       return [traces, layout];
@@ -422,6 +548,8 @@ export const helpers = {
         chart.layout
       );
 
+      layout.title = chartTitle(layout.title, sim);
+
       return [
         [points, density, upper, right], layout
       ];
@@ -476,8 +604,9 @@ export const helpers = {
           },
           type: 'scatter'
         });
+      const title = chartTitle("Profits for each agent and period", sim);
       const layout = Object.assign({},
-        defaultLayout, { title: "Profits for each agent and period" },
+        defaultLayout, { title },
         yaxisRange(sim),
         chart.layout
       );
@@ -486,17 +615,13 @@ export const helpers = {
   }
 };
 
-export function build(arrayOfVisuals, myLibrary = helpers) {
-  return arrayOfVisuals.map(function (visual) {
+export function build(arrayOfVisuals) {
+  return arrayOfVisuals.map(function (spec) {
     try {
-      let f = myLibrary[visual.f](visual);
-      if (typeof(f) !== "function")
-        throw new Error("visualization function named " + visual.f + " does not exist");
-      f.meta = visual;
-      return f;
+      return new VisualizationFactory(spec);
     } catch (e) {
       console.log(e); // eslint-disable-line no-console
       return undefined;
     }
-  }).filter(function (visualFunction) { return (typeof(visualFunction) === "function"); });
+  });
 }
