@@ -244,7 +244,7 @@ export const helpers = {
       if (supplyCosts[supplyCosts.length-1]<=h){
         supplyCosts.push(h+1);
       }
-      const ceModel = marketPricing.crossSingleUnitSupplyAndDemand(demandValues,supplyCosts);
+      const ceModel = marketPricing.crossSingleUnitDemandAndSupply(demandValues,supplyCosts);
       const ceResult = (ceModel && ceModel.p && ceModel.q)? ('CE: '+JSON.stringify(ceModel)): '';
       const maxlen = Math.max(demandValues.length, supplyCosts.length);
       const minlen = Math.min(demandValues.length, supplyCosts.length);

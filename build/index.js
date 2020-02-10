@@ -372,7 +372,7 @@ var helpers = {
         supplyCosts.push(h + 1);
       }
 
-      var ceModel = marketPricing.crossSingleUnitSupplyAndDemand(demandValues, supplyCosts);
+      var ceModel = marketPricing.crossSingleUnitDemandAndSupply(demandValues, supplyCosts);
       var ceResult = ceModel && ceModel.p && ceModel.q ? 'CE: ' + JSON.stringify(ceModel) : '';
       var maxlen = Math.max(demandValues.length, supplyCosts.length);
       var minlen = Math.min(demandValues.length, supplyCosts.length);
