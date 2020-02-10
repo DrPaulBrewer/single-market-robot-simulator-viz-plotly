@@ -24,7 +24,7 @@ var _clone = _interopRequireDefault(require("clone"));
 
 var Random = _interopRequireWildcard(require("random-js"));
 
-var _marketPricing = _interopRequireDefault(require("market-pricing"));
+var marketPricing = _interopRequireWildcard(require("market-pricing"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -372,7 +372,7 @@ var helpers = {
         supplyCosts.push(h + 1);
       }
 
-      var ceModel = (0, _marketPricing["default"])(demandValues, supplyCosts);
+      var ceModel = marketPricing.crossSingleUnitSupplyAndDemand(demandValues, supplyCosts);
       var ceResult = ceModel && ceModel.p && ceModel.q ? 'CE: ' + JSON.stringify(ceModel) : '';
       var maxlen = Math.max(demandValues.length, supplyCosts.length);
       var minlen = Math.min(demandValues.length, supplyCosts.length);

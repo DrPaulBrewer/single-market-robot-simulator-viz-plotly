@@ -7,7 +7,7 @@ import transpluck from 'transpluck';
 import stepify from 'stepify-plotly';
 import clone from 'clone';
 import * as Random from 'random-js';
-import crossSingleUnitSupplyAndDemand from 'market-pricing';
+import * as marketPricing from 'market-pricing';
 
 export class PlotlyDataLayoutConfig {
   constructor(options){
@@ -244,7 +244,7 @@ export const helpers = {
       if (supplyCosts[supplyCosts.length-1]<=h){
         supplyCosts.push(h+1);
       }
-      const ceModel = crossSingleUnitSupplyAndDemand(demandValues,supplyCosts);
+      const ceModel = marketPricing.crossSingleUnitSupplyAndDemand(demandValues,supplyCosts);
       const ceResult = (ceModel && ceModel.p && ceModel.q)? ('CE: '+JSON.stringify(ceModel)): '';
       const maxlen = Math.max(demandValues.length, supplyCosts.length);
       const minlen = Math.min(demandValues.length, supplyCosts.length);
