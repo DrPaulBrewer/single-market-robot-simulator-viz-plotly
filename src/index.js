@@ -6,6 +6,8 @@ import * as d3A from 'd3-array';
 import transpluck from 'transpluck';
 import stepify from 'stepify-plotly';
 import clone from 'clone';
+import deepmerge from 'deepmerge';
+import decamelize from 'decamelize';
 import * as Random from 'random-js';
 import * as marketPricing from 'market-pricing';
 
@@ -40,13 +42,15 @@ export class PlotlyDataLayoutConfig {
 
   adjustTitle(modifier){
     const layout = this.layout;
-    if (modifier.replace && (modifier.replace.length > 0))
-      layout.title = modifier.replace;
-    if (layout.title) {
+    if (!layout.title) layout.title = {};
+    if (modifier.replace && (modifier.replace.length > 0)){
+      layout.title.text = modifier.replace;
+    }
+    if (layout.title && layout.title.text) {
       if (modifier.prepend && (modifier.prepend.length > 0))
-        layout.title = modifier.prepend + layout.title;
+        layout.title.text = modifier.prepend + layout.title;
       if (modifier.append && (modifier.append.length > 0))
-        layout.title += modifier.append;
+        layout.title.text += modifier.append;
     }
     return this;
   }
@@ -109,8 +113,8 @@ export class VisualizationFactory  {
     // the loaders were written first; adapt their output
     // from triplet array format to object property format
     const [data,_layout,_config] = this.loader(from);
-    const layout = Object.assign({}, clone(this.layout), clone(_layout));
-    const config = Object.assign({}, clone(this.config), clone(_config));
+    const layout = deepmerge(this.layout,_layout);
+    const config = deepmerge(this.config,_config);
     const v =  new Visualization({ data, layout, config});
     v.setInteractivity(isInteractive);
     if (title){
@@ -169,18 +173,65 @@ function extract(log){
   return sample(data);
 }
 
-export function yaxisRange(sim, axisOptions={}) {
-  return {
-    yaxis: Object.assign(
-      {},
-      axisOptions,
-      { range: [(sim.config.L || 0), (sim.config.H || 200)] }
-    )
-  };
+function hasAnyKeyword(vars, keyWords){
+  if (Array.isArray(vars))
+    return vars.any(hasAnyKeyword);
+  return (
+    (typeof(vars)==='string') &&
+    (keyWords.any((k)=>(vars.toLowerCase().includes(k))))
+  );
 }
 
-export function chartTitle(suggested,sim){
-  return suggested+"<br>case: "+sim.config.caseid;
+function hasPriceVars(vars){
+  const keyWords = ['price','value','cost'];
+  return hasAnyKeyword(vars,keyWords);
+}
+
+function hasUnitVars(vars){
+  const keyWords = ['gini','efficiencyOfAllocation'];
+  return hasAnyKeyword(vars,keyWords);
+}
+
+function axisTitle(vs){
+  const v1 = ((Array.isArray(vs) && (vs.length===1) && vs[0])) ||
+    ((typeof(vs)==='string') && vs);
+  let text = '';
+  if (v1){
+    text = decamelize(v1,' ');
+  } else if (hasPriceVars(vs)){
+    text = 'P';
+  }
+  return { title: { text }};
+}
+
+function axisRange(vs, sim){
+    if (hasPriceVars(vs)){
+      return {range: [0, sim.config.H]};
+    }
+    if (hasUnitVars(vs)){
+      return {range: [0,1]};
+    }
+}
+
+function caseIdAnnotation(caseid){
+  return (caseid===undefined)? '': (`<br>case: ${caseid}`);
+}
+
+function getLayout({xs,ys,title,sim,xrange,yrange}){
+  const items = [defaultLayout];
+  function xaxis(obj){ if (obj) items.push({xaxis: obj}); }
+  function yaxis(obj){ if (obj) items.push({yaxis: obj}); }
+  const caseid = sim && sim.config && sim.config.caseid;
+  items.push({ title: { text: (title || '')+caseIdAnnotation(caseid) } });
+  if (xs){
+    xaxis(axisTitle(xs));
+    xaxis(xrange? ({range: xrange}) : (axisRange(xs,sim)));
+  }
+  if (ys){
+    yaxis(axisTitle(ys));
+    yaxis(yrange? ({range: yrange}) : (axisRange(ys,sim)));
+  }
+  return deepmerge.all(items);
 }
 
 export function plotFactory(chart) {
@@ -218,11 +269,7 @@ export function plotFactory(chart) {
       }
       return { name, mode, type, x, y };
     });
-    let layout = Object.assign({},
-      clone(defaultLayout), { title: chartTitle(chart.title, sim) },
-      yaxisRange(sim),
-      chart.layout
-    );
+    const layout = getLayout({xs: chart.xs,ys: chart.ys, title: chart.title, sim});
     return [traces, layout];
   };
 }
@@ -298,19 +345,27 @@ export const helpers = {
         type,
         steps
       };
-      let layout = Object.assign({},
+      let layout = deepmerge.all([
         clone(defaultLayout),
-        yaxisRange(sim, {
-          title: 'P'
-        }),
+        { yaxis:{
+            range: [0, sim.config.H],
+            title: {
+              text: "P"
+            }
+          }
+        },
         {
           xaxis: {
             range: [0, cutoff+1],
-            title: "Q"
+            title: {
+              text: "Q"
+            }
           },
-          title: " S/D Model <br>Case "+sim.config.caseid+"<br><sub>"+ceResult+"</sub>"
+          title: {
+            text: " S/D Model <br>Case "+sim.config.caseid+"<br><sub>"+ceResult+"</sub>"
+          }
         }
-      );
+      ]);
       let plotlyData = [demand, supply].map(stepify);
       return [plotlyData, layout];
     };
@@ -342,9 +397,11 @@ export const helpers = {
           showlegend: false
         };
       });
-      const layout = {
-        title: 'box plot for ' + chart.log + '.' + chart.y
-      };
+      const layout = getLayout({
+        title: chart.title,
+        ys: [chart.y],
+        xs: 'caseId'
+      });
       return [data, layout];
     };
   },
@@ -375,9 +432,11 @@ export const helpers = {
           showlegend: false
         };
       });
-      const layout = {
-        title: 'violin plot for ' + chart.log + '.' + chart.y
-      };
+      const layout = getLayout({
+        title: chart.title,
+        ys: [chart.y],
+        xs: 'caseId'
+      });
       return [data, layout];
     };
   },
@@ -387,6 +446,8 @@ export const helpers = {
 
     /* req chart properties are title, names, logs, vars */
     /* opt chart properties are bins, range */
+
+    const nbinsxDefault = 100;
 
     return function (sim) {
       let traces = chart.names.map(function (name, i) {
@@ -405,38 +466,34 @@ export const helpers = {
           x,
           type: 'histogram',
           opacity: 0.60,
-          nbinsx: 100
+          nbinsx: nbinsxDefault
         };
       });
-      let myrange, mybins;
-      let mymin, mymax;
-      if (chart.range) {
-        myrange = chart.range;
-      } else {
+      const layout = Object.assign(
+        {},
+        getLayout({sim, xrange: chart.range, xs: chart.vars, ys: 'N', title: chart.title}),
+        {barmode: 'overlay'}
+      );
+      let mymin, mymax, mybins;
+      if (layout && layout.xaxis && (layout.xaxis.range)){
+          [mymin, mymax] = layout.xaxis.range;
+      }
+      if ((mymin===undefined) || (mymax===undefined)){
         mymin = d3A.min(traces, function (trace) {
           return d3A.min(trace.x);
         });
         mymax = d3A.max(traces, function (trace) {
           return d3A.max(trace.x);
         });
-        myrange = [mymin, mymax];
+        layout.xaxis.range = [mymin,mymax];
       }
       if (chart.bins) {
         mybins = chart.bins;
       } else {
         mybins = Math.max(0, Math.min(200, Math.floor(1 + mymax - mymin)));
       }
-      if (mybins && mybins !== 100)
+      if (mybins && (mybins>=2) && (mybins !== nbinsxDefault))
         traces.forEach(function (trace) { trace.nbinsx = mybins; });
-      let layout = Object.assign({},
-        clone(defaultLayout), {
-          barmode: 'overlay',
-          xaxis: {
-            range: myrange
-          },
-          title: chartTitle(chart.title,sim)
-        }
-      );
       return [traces, layout];
     };
   },
@@ -522,9 +579,12 @@ export const helpers = {
         chart.axiscommon
       );
 
-      let layout = Object.assign({},
-        defaultLayout, {
-          title: chart.title,
+      let layout = deepmerge.all([
+        defaultLayout,
+        {
+          title: {
+            text: chart.title+caseIdAnnotation(sim.config && sim.config.caseid)
+          },
           showlegend: false,
           margin: { t: 50 },
           hovermode: 'closest',
@@ -542,10 +602,8 @@ export const helpers = {
             axiscommon, { domain: [0.8, 1] }
           )
         },
-        chart.layout
-      );
-
-      layout.title = chartTitle(layout.title, sim);
+        chart.layout || {}
+      ]);
 
       return [
         [points, density, upper, right], layout
@@ -601,11 +659,14 @@ export const helpers = {
           },
           type: 'scatter'
         });
-      const title = chartTitle("Profits for each agent and period", sim);
-      const layout = Object.assign({},
-        defaultLayout, { title },
-        yaxisRange(sim),
-        chart.layout
+      const layout = deepmerge(
+        getLayout({
+          title: chart.title || "Profits for each agent and period",
+          xs:'period',
+          ys:'profit',
+          sim
+        }),
+        chart.layout || {}
       );
       return [traces, layout];
     };

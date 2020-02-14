@@ -8,8 +8,6 @@ exports.setSampleSize = setSampleSize;
 exports.getSampleSize = getSampleSize;
 exports.setFilter = setFilter;
 exports.getFilter = getFilter;
-exports.yaxisRange = yaxisRange;
-exports.chartTitle = chartTitle;
 exports.plotFactory = plotFactory;
 exports.build = build;
 exports.helpers = exports.VisualizationFactory = exports.Visualization = exports.PlotlyDataLayoutConfig = void 0;
@@ -21,6 +19,10 @@ var _transpluck = _interopRequireDefault(require("transpluck"));
 var _stepifyPlotly = _interopRequireDefault(require("stepify-plotly"));
 
 var _clone = _interopRequireDefault(require("clone"));
+
+var _deepmerge = _interopRequireDefault(require("deepmerge"));
+
+var _decamelize = _interopRequireDefault(require("decamelize"));
 
 var Random = _interopRequireWildcard(require("random-js"));
 
@@ -98,11 +100,15 @@ function () {
     key: "adjustTitle",
     value: function adjustTitle(modifier) {
       var layout = this.layout;
-      if (modifier.replace && modifier.replace.length > 0) layout.title = modifier.replace;
+      if (!layout.title) layout.title = {};
 
-      if (layout.title) {
-        if (modifier.prepend && modifier.prepend.length > 0) layout.title = modifier.prepend + layout.title;
-        if (modifier.append && modifier.append.length > 0) layout.title += modifier.append;
+      if (modifier.replace && modifier.replace.length > 0) {
+        layout.title.text = modifier.replace;
+      }
+
+      if (layout.title && layout.title.text) {
+        if (modifier.prepend && modifier.prepend.length > 0) layout.title.text = modifier.prepend + layout.title;
+        if (modifier.append && modifier.append.length > 0) layout.title.text += modifier.append;
       }
 
       return this;
@@ -213,8 +219,8 @@ function () {
           _layout = _this$loader2[1],
           _config = _this$loader2[2];
 
-      var layout = Object.assign({}, (0, _clone["default"])(this.layout), (0, _clone["default"])(_layout));
-      var config = Object.assign({}, (0, _clone["default"])(this.config), (0, _clone["default"])(_config));
+      var layout = (0, _deepmerge["default"])(this.layout, _layout);
+      var config = (0, _deepmerge["default"])(this.config, _config);
       var v = new Visualization({
         data: data,
         layout: layout,
@@ -284,17 +290,101 @@ function extract(log) {
   return sample(data);
 }
 
-function yaxisRange(sim) {
-  var axisOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+function hasAnyKeyword(vars, keyWords) {
+  if (Array.isArray(vars)) return vars.any(hasAnyKeyword);
+  return typeof vars === 'string' && keyWords.any(function (k) {
+    return vars.toLowerCase().includes(k);
+  });
+}
+
+function hasPriceVars(vars) {
+  var keyWords = ['price', 'value', 'cost'];
+  return hasAnyKeyword(vars, keyWords);
+}
+
+function hasUnitVars(vars) {
+  var keyWords = ['gini', 'efficiencyOfAllocation'];
+  return hasAnyKeyword(vars, keyWords);
+}
+
+function axisTitle(vs) {
+  var v1 = Array.isArray(vs) && vs.length === 1 && vs[0] || typeof vs === 'string' && vs;
+  var text = '';
+
+  if (v1) {
+    text = (0, _decamelize["default"])(v1, ' ');
+  } else if (hasPriceVars(vs)) {
+    text = 'P';
+  }
+
   return {
-    yaxis: Object.assign({}, axisOptions, {
-      range: [sim.config.L || 0, sim.config.H || 200]
-    })
+    title: {
+      text: text
+    }
   };
 }
 
-function chartTitle(suggested, sim) {
-  return suggested + "<br>case: " + sim.config.caseid;
+function axisRange(vs, sim) {
+  if (hasPriceVars(vs)) {
+    return {
+      range: [0, sim.config.H]
+    };
+  }
+
+  if (hasUnitVars(vs)) {
+    return {
+      range: [0, 1]
+    };
+  }
+}
+
+function caseIdAnnotation(caseid) {
+  return caseid === undefined ? '' : "<br>case: ".concat(caseid);
+}
+
+function getLayout(_ref) {
+  var xs = _ref.xs,
+      ys = _ref.ys,
+      title = _ref.title,
+      sim = _ref.sim,
+      xrange = _ref.xrange,
+      yrange = _ref.yrange;
+  var items = [defaultLayout];
+
+  function xaxis(obj) {
+    if (obj) items.push({
+      xaxis: obj
+    });
+  }
+
+  function yaxis(obj) {
+    if (obj) items.push({
+      yaxis: obj
+    });
+  }
+
+  var caseid = sim && sim.config && sim.config.caseid;
+  items.push({
+    title: {
+      text: (title || '') + caseIdAnnotation(caseid)
+    }
+  });
+
+  if (xs) {
+    xaxis(axisTitle(xs));
+    xaxis(xrange ? {
+      range: xrange
+    } : axisRange(xs, sim));
+  }
+
+  if (ys) {
+    yaxis(axisTitle(ys));
+    yaxis(yrange ? {
+      range: yrange
+    } : axisRange(ys, sim));
+  }
+
+  return _deepmerge["default"].all(items);
 }
 
 function plotFactory(chart) {
@@ -341,9 +431,12 @@ function plotFactory(chart) {
         y: y
       };
     });
-    var layout = Object.assign({}, (0, _clone["default"])(defaultLayout), {
-      title: chartTitle(chart.title, sim)
-    }, yaxisRange(sim), chart.layout);
+    var layout = getLayout({
+      xs: chart.xs,
+      ys: chart.ys,
+      title: chart.title,
+      sim: sim
+    });
     return [traces, layout];
   };
 }
@@ -443,15 +536,26 @@ var helpers = {
         type: type,
         steps: steps
       };
-      var layout = Object.assign({}, (0, _clone["default"])(defaultLayout), yaxisRange(sim, {
-        title: 'P'
-      }), {
+
+      var layout = _deepmerge["default"].all([(0, _clone["default"])(defaultLayout), {
+        yaxis: {
+          range: [0, sim.config.H],
+          title: {
+            text: "P"
+          }
+        }
+      }, {
         xaxis: {
           range: [0, cutoff + 1],
-          title: "Q"
+          title: {
+            text: "Q"
+          }
         },
-        title: " S/D Model <br>Case " + sim.config.caseid + "<br><sub>" + ceResult + "</sub>"
-      });
+        title: {
+          text: " S/D Model <br>Case " + sim.config.caseid + "<br><sub>" + ceResult + "</sub>"
+        }
+      }]);
+
       var plotlyData = [demand, supply].map(_stepifyPlotly["default"]);
       return [plotlyData, layout];
     };
@@ -483,9 +587,11 @@ var helpers = {
           showlegend: false
         };
       });
-      var layout = {
-        title: 'box plot for ' + chart.log + '.' + chart.y
-      };
+      var layout = getLayout({
+        title: chart.title,
+        ys: [chart.y],
+        xs: 'caseId'
+      });
       return [data, layout];
     };
   },
@@ -517,9 +623,11 @@ var helpers = {
           showlegend: false
         };
       });
-      var layout = {
-        title: 'violin plot for ' + chart.log + '.' + chart.y
-      };
+      var layout = getLayout({
+        title: chart.title,
+        ys: [chart.y],
+        xs: 'caseId'
+      });
       return [data, layout];
     };
   },
@@ -527,6 +635,7 @@ var helpers = {
     /* req chart properties are title, names, logs, vars */
 
     /* opt chart properties are bins, range */
+    var nbinsxDefault = 100;
     return function (sim) {
       var traces = chart.names.map(function (name, i) {
         var mylog = chart.logs[i % chart.logs.length];
@@ -548,22 +657,35 @@ var helpers = {
           x: x,
           type: 'histogram',
           opacity: 0.60,
-          nbinsx: 100
+          nbinsx: nbinsxDefault
         };
       });
-      var myrange, mybins;
-      var mymin, mymax;
+      var layout = Object.assign({}, getLayout({
+        sim: sim,
+        xrange: chart.range,
+        xs: chart.vars,
+        ys: 'N',
+        title: chart.title
+      }), {
+        barmode: 'overlay'
+      });
+      var mymin, mymax, mybins;
 
-      if (chart.range) {
-        myrange = chart.range;
-      } else {
+      if (layout && layout.xaxis && layout.xaxis.range) {
+        var _layout$xaxis$range = _slicedToArray(layout.xaxis.range, 2);
+
+        mymin = _layout$xaxis$range[0];
+        mymax = _layout$xaxis$range[1];
+      }
+
+      if (mymin === undefined || mymax === undefined) {
         mymin = d3A.min(traces, function (trace) {
           return d3A.min(trace.x);
         });
         mymax = d3A.max(traces, function (trace) {
           return d3A.max(trace.x);
         });
-        myrange = [mymin, mymax];
+        layout.xaxis.range = [mymin, mymax];
       }
 
       if (chart.bins) {
@@ -572,15 +694,8 @@ var helpers = {
         mybins = Math.max(0, Math.min(200, Math.floor(1 + mymax - mymin)));
       }
 
-      if (mybins && mybins !== 100) traces.forEach(function (trace) {
+      if (mybins && mybins >= 2 && mybins !== nbinsxDefault) traces.forEach(function (trace) {
         trace.nbinsx = mybins;
-      });
-      var layout = Object.assign({}, (0, _clone["default"])(defaultLayout), {
-        barmode: 'overlay',
-        xaxis: {
-          range: myrange
-        },
-        title: chartTitle(chart.title, sim)
       });
       return [traces, layout];
     };
@@ -651,8 +766,11 @@ var helpers = {
         showgrid: false,
         zeroline: false
       }, chart.axiscommon);
-      var layout = Object.assign({}, defaultLayout, {
-        title: chart.title,
+
+      var layout = _deepmerge["default"].all([defaultLayout, {
+        title: {
+          text: chart.title + caseIdAnnotation(sim.config && sim.config.caseid)
+        },
         showlegend: false,
         margin: {
           t: 50
@@ -671,8 +789,8 @@ var helpers = {
         yaxis2: Object.assign({}, axiscommon, {
           domain: [0.8, 1]
         })
-      }, chart.layout);
-      layout.title = chartTitle(layout.title, sim);
+      }, chart.layout || {}]);
+
       return [[points, density, upper, right], layout];
     };
   },
@@ -731,10 +849,12 @@ var helpers = {
         });
       }
 
-      var title = chartTitle("Profits for each agent and period", sim);
-      var layout = Object.assign({}, defaultLayout, {
-        title: title
-      }, yaxisRange(sim), chart.layout);
+      var layout = (0, _deepmerge["default"])(getLayout({
+        title: chart.title || "Profits for each agent and period",
+        xs: 'period',
+        ys: 'profit',
+        sim: sim
+      }), chart.layout || {});
       return [traces, layout];
     };
   }
