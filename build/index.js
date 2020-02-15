@@ -291,8 +291,8 @@ function extract(log) {
 }
 
 function hasAnyKeyword(vars, keyWords) {
-  if (Array.isArray(vars)) return vars.any(hasAnyKeyword);
-  return typeof vars === 'string' && keyWords.any(function (k) {
+  if (Array.isArray(vars)) return vars.some(hasAnyKeyword);
+  return typeof vars === 'string' && keyWords.some(function (k) {
     return vars.toLowerCase().includes(k);
   });
 }
