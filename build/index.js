@@ -329,13 +329,13 @@ function axisRange(vs, sim) {
     };
   }
 
-  if (hasAnyKeyword(vs, 'efficiency')) {
+  if (hasAnyKeyword(vs, ['efficiency'])) {
     return {
       range: [0, 100]
     };
   }
 
-  if (hasAnyKeyword(vs, 'gini')) {
+  if (hasAnyKeyword(vs, ['gini'])) {
     return {
       range: [0, 1]
     };

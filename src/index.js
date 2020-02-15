@@ -205,10 +205,10 @@ function axisRange(vs, sim){
       const h = sim && sim.config && sim.config.H;
       return (h && {range: [0,+h]});
     }
-    if (hasAnyKeyword(vs,'efficiency')){
+    if (hasAnyKeyword(vs,['efficiency'])){
       return {range: [0,100]};
     }
-    if (hasAnyKeyword(vs,'gini')){
+    if (hasAnyKeyword(vs,['gini'])){
       return {range: [0,1]};
     }
 }
