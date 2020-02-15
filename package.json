@@ -8,6 +8,8 @@
     "build": "babel build src/index.js -o build/index.js",
     "doc": "node_modules/.bin/esdoc -c esdoc.json",
     "lint": "node_modules/.bin/eslint src/index.js",
+    "test": "nyc --reporter=text mocha --require @babel/register --slow 50 --timeout 300000 ",
+    "coverage": "nyc --reporter=text-lcov --require @babel/register mocha --timeout 300000 | coveralls ",
     "go": "npm run clean && npm run lint && npm run build"
   },
   "repository": {
@@ -30,6 +32,7 @@
     "decamelize": "^4.0.0",
     "deepmerge": "^4.2.2",
     "market-pricing": "^1.5.0",
+    "random-js": "^2.1.0",
     "stepify-plotly": "^1.0.6",
     "transpluck": "^1.0.4"
   },
@@ -40,7 +43,11 @@
     "@babel/preset-env": "^7.8.4",
     "@babel/register": "^7.8.3",
     "esdoc": "^1.1.0",
-    "eslint": "^6.8.0"
+    "eslint": "^6.8.0",
+    "mocha": "^7.0.1",
+    "nyc": "^15.0.0",
+    "should": "^13.2.3",
+    "single-market-robot-simulator": "^5.12.0"
   },
   "jsnext:main": "src/index.js"
 }
