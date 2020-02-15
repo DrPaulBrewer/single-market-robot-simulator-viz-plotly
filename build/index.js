@@ -291,7 +291,9 @@ function extract(log) {
 }
 
 function hasAnyKeyword(vars, keyWords) {
-  if (Array.isArray(vars)) return vars.some(hasAnyKeyword);
+  if (Array.isArray(vars)) return vars.some(function (v) {
+    return hasAnyKeyword(v, keyWords);
+  });
   return typeof vars === 'string' && keyWords.some(function (k) {
     return vars.toLowerCase().includes(k);
   });
