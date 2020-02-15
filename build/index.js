@@ -295,7 +295,7 @@ function hasAnyKeyword(vars, keyWords) {
     return hasAnyKeyword(v, keyWords);
   });
   return typeof vars === 'string' && keyWords.some(function (k) {
-    return vars.toLowerCase().includes(k);
+    return vars.toLowerCase().includes(k.toLowerCase());
   });
 }
 

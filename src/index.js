@@ -178,7 +178,7 @@ function hasAnyKeyword(vars, keyWords){
     return vars.some((v)=>(hasAnyKeyword(v,keyWords)));
   return (
     (typeof(vars)==='string') &&
-    (keyWords.some((k)=>(vars.toLowerCase().includes(k))))
+    (keyWords.some((k)=>(vars.toLowerCase().includes(k.toLowerCase()))))
   );
 }
 
