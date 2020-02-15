@@ -328,8 +328,9 @@ function axisTitle(vs) {
 
 function axisRange(vs, sim) {
   if (hasPriceVars(vs)) {
-    return {
-      range: [0, sim.config.H]
+    var h = sim && sim.config && sim.config.H;
+    return h && {
+      range: [0, +h]
     };
   }
 
