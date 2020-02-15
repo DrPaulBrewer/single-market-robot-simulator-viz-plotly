@@ -113,8 +113,8 @@ export class VisualizationFactory  {
     // the loaders were written first; adapt their output
     // from triplet array format to object property format
     const [data,_layout,_config] = this.loader(from);
-    const layout = deepmerge(this.layout,_layout);
-    const config = deepmerge(this.config,_config);
+    const layout = deepmerge(this.layout,_layout || {});
+    const config = deepmerge(this.config,_config || {});
     const v =  new Visualization({ data, layout, config});
     v.setInteractivity(isInteractive);
     if (title){

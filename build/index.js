@@ -219,8 +219,8 @@ function () {
           _layout = _this$loader2[1],
           _config = _this$loader2[2];
 
-      var layout = (0, _deepmerge["default"])(this.layout, _layout);
-      var config = (0, _deepmerge["default"])(this.config, _config);
+      var layout = (0, _deepmerge["default"])(this.layout, _layout || {});
+      var config = (0, _deepmerge["default"])(this.config, _config || {});
       var v = new Visualization({
         data: data,
         layout: layout,
