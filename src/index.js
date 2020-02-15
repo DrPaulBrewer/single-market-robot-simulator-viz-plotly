@@ -175,10 +175,10 @@ function extract(log){
 
 function hasAnyKeyword(vars, keyWords){
   if (Array.isArray(vars))
-    return vars.any(hasAnyKeyword);
+    return vars.some(hasAnyKeyword);
   return (
     (typeof(vars)==='string') &&
-    (keyWords.any((k)=>(vars.toLowerCase().includes(k))))
+    (keyWords.some((k)=>(vars.toLowerCase().includes(k))))
   );
 }
 
