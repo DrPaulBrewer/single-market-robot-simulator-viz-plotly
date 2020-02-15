@@ -304,11 +304,6 @@ function hasPriceVars(vars) {
   return hasAnyKeyword(vars, keyWords);
 }
 
-function hasUnitVars(vars) {
-  var keyWords = ['gini', 'efficiencyOfAllocation'];
-  return hasAnyKeyword(vars, keyWords);
-}
-
 function axisTitle(vs) {
   var v1 = Array.isArray(vs) && vs.length === 1 && vs[0] || typeof vs === 'string' && vs;
   var text = '';
@@ -334,7 +329,13 @@ function axisRange(vs, sim) {
     };
   }
 
-  if (hasUnitVars(vs)) {
+  if (hasAnyKeyword(vs, 'efficiency')) {
+    return {
+      range: [0, 100]
+    };
+  }
+
+  if (hasAnyKeyword(vs, 'gini')) {
     return {
       range: [0, 1]
     };
