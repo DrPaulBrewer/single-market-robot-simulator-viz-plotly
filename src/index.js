@@ -692,13 +692,13 @@ export const helpers = {
       const column = transpluck(extracted);
       const traces = [];
       const profitHeader = [].concat(
-        numberedStringArray('Buyer',sim.config.numberOfBuyers),
-        numberedStringArray('Seller',sim.config.numberOfSellers)
+        numberedStringArray('B',sim.config.numberOfBuyers),
+        numberedStringArray('S',sim.config.numberOfSellers)
       );
       for (let i = 0, l = sim.numberOfAgents;i<l;++i)
         traces.push({
           x: column.period,
-          y: column['y'+i],
+          y: column['y'+(i+1)],
           name: profitHeader[i],
           mode: 'markers',
           marker: {

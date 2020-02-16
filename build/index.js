@@ -873,12 +873,12 @@ var helpers = {
       var extracted = extract(sim.logs.profit);
       var column = (0, _transpluck["default"])(extracted);
       var traces = [];
-      var profitHeader = [].concat(numberedStringArray('Buyer', sim.config.numberOfBuyers), numberedStringArray('Seller', sim.config.numberOfSellers));
+      var profitHeader = [].concat(numberedStringArray('B', sim.config.numberOfBuyers), numberedStringArray('S', sim.config.numberOfSellers));
 
       for (var i = 0, l = sim.numberOfAgents; i < l; ++i) {
         traces.push({
           x: column.period,
-          y: column['y' + i],
+          y: column['y' + (i + 1)],
           name: profitHeader[i],
           mode: 'markers',
           marker: {
