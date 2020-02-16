@@ -846,7 +846,7 @@ var helpers = {
       var data = profitHeader.map(function (name, j) {
         return {
           y: column['y' + j],
-          name: name,
+          x: name,
           legendgroup: sim.pool.agents[j].constructor.name,
           type: 'violin',
           meanline: {

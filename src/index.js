@@ -662,11 +662,10 @@ export const helpers = {
           numberedStringArray('B',sim.config.numberOfBuyers),
           numberedStringArray('S',sim.config.numberOfSellers)
         );
-
         const data = profitHeader.map((name,j)=>(
           {
             y: column['y'+j],
-            name,
+            x: name,
             legendgroup: sim.pool.agents[j].constructor.name,
             type: 'violin',
             meanline: {
