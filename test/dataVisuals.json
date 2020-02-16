@@ -227,5 +227,9 @@
     "names": ["OK buy order", "OK sell order", "rejected buy order", "rejected sell order"],
     "logs": ["buyorder", "sellorder", "rejectbuyorder", "rejectsellorder"],
     "vars": ["buyLimitPrice", "sellLimitPrice", "buyLimitPrice", "sellLimitPrice"]
+  },
+  {
+    "f": "plotProfitDistributionViolin",
+    "title": "[v] Profit Distribution vs. Agent Id"
   }
 ]

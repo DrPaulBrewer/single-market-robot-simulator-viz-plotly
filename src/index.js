@@ -280,6 +280,14 @@ export function competitiveEquilibriumModel({demand,supply}){
   return ceModel;
 }
 
+function numberedStringArray(s,n){
+  return (
+    new Array(n)
+    .fill(0)
+    .map((z,j)=>(s+(+1+j)))
+  );
+}
+
 /* this exports all the functions below, and also assigns them to the helpers object.
  * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
  */
@@ -645,21 +653,42 @@ export const helpers = {
     });
   },
 
+  plotProfitDistributionViolin(chart){
+    return function(sim){
+        const extracted = extract(sim.logs.profit);
+        const column = transpluck(extracted);
+        const profitHeader = [].concat(
+          numberedStringArray('Buyer',sim.config.numberOfBuyers),
+          numberedStringArray('Seller',sim.config.numberOfSellers)
+        );
+        const data = profitHeader.map((name,j)=>(
+          {
+            y: column['y'+j],
+            name: name+'<br>'+sim.pool.agents[j].constructor.name,
+            type: 'violin',
+            meanline: {
+              visible: true
+            },
+            showlegend: false
+          }
+        ));
+        const layout = getLayout({
+          title: chart.title,
+          ys: 'Profit',
+          xs: 'caseId'
+        });
+        return [data,layout];
+    };
+  },
+
   plotProfitTimeSeries(chart) {
     return function (sim) {
       const extracted = extract(sim.logs.profit);
       const column = transpluck(extracted);
       const traces = [];
-      function numbered(s,n){
-        return (
-          new Array(n)
-          .fill(0)
-          .map((z,j)=>(s+(+1+j)))
-        );
-      }
       const profitHeader = [].concat(
-        numbered('Buyer',sim.config.numberOfBuyers),
-        numbered('Seller',sim.config.numberOfSellers)
+        numberedStringArray('Buyer',sim.config.numberOfBuyers),
+        numberedStringArray('Seller',sim.config.numberOfSellers)
       );
       for (let i = 0, l = sim.numberOfAgents;i<l;++i)
         traces.push({

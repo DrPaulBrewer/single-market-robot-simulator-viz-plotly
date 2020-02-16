@@ -453,6 +453,12 @@ function competitiveEquilibriumModel(_ref2) {
   ceModel.summary = ceModel && ceModel.p && ceModel.q ? 'CE: ' + JSON.stringify(ceModel) : '';
   return ceModel;
 }
+
+function numberedStringArray(s, n) {
+  return new Array(n).fill(0).map(function (z, j) {
+    return s + (+1 + j);
+  });
+}
 /* this exports all the functions below, and also assigns them to the helpers object.
  * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
  */
@@ -831,19 +837,36 @@ var helpers = {
       ys: ['buyLimitPrice', 'sellLimitPrice', 'price']
     });
   },
+  plotProfitDistributionViolin: function plotProfitDistributionViolin(chart) {
+    return function (sim) {
+      var extracted = extract(sim.logs.profit);
+      var column = (0, _transpluck["default"])(extracted);
+      var profitHeader = [].concat(numberedStringArray('Buyer', sim.config.numberOfBuyers), numberedStringArray('Seller', sim.config.numberOfSellers));
+      var data = profitHeader.map(function (name, j) {
+        return {
+          y: column['y' + j],
+          name: name + '<br>' + sim.pool.agents[j].constructor.name,
+          type: 'violin',
+          meanline: {
+            visible: true
+          },
+          showlegend: false
+        };
+      });
+      var layout = getLayout({
+        title: chart.title,
+        ys: 'Profit',
+        xs: 'caseId'
+      });
+      return [data, layout];
+    };
+  },
   plotProfitTimeSeries: function plotProfitTimeSeries(chart) {
     return function (sim) {
       var extracted = extract(sim.logs.profit);
       var column = (0, _transpluck["default"])(extracted);
       var traces = [];
-
-      function numbered(s, n) {
-        return new Array(n).fill(0).map(function (z, j) {
-          return s + (+1 + j);
-        });
-      }
-
-      var profitHeader = [].concat(numbered('Buyer', sim.config.numberOfBuyers), numbered('Seller', sim.config.numberOfSellers));
+      var profitHeader = [].concat(numberedStringArray('Buyer', sim.config.numberOfBuyers), numberedStringArray('Seller', sim.config.numberOfSellers));
 
       for (var i = 0, l = sim.numberOfAgents; i < l; ++i) {
         traces.push({
