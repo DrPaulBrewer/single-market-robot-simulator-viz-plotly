@@ -600,7 +600,8 @@ export const helpers = {
         getLayout({
           title: chart.title,
           xs: chart.vars[0],
-          ys: chart.vars[1]
+          ys: chart.vars[1],
+          sim
         }),
         {
           showlegend: false,
@@ -658,24 +659,25 @@ export const helpers = {
         const extracted = extract(sim.logs.profit);
         const column = transpluck(extracted);
         const profitHeader = [].concat(
-          numberedStringArray('Buyer',sim.config.numberOfBuyers),
-          numberedStringArray('Seller',sim.config.numberOfSellers)
+          numberedStringArray('B',sim.config.numberOfBuyers),
+          numberedStringArray('S',sim.config.numberOfSellers)
         );
+
         const data = profitHeader.map((name,j)=>(
           {
             y: column['y'+j],
-            name: name+'<br>'+sim.pool.agents[j].constructor.name,
+            name,
+            legendgroup: sim.pool.agents[j].constructor.name,
             type: 'violin',
             meanline: {
               visible: true
-            },
-            showlegend: false
+            }
           }
         ));
         const layout = getLayout({
           title: chart.title,
           ys: 'Profit',
-          xs: 'caseId'
+          sim
         });
         return [data,layout];
     };

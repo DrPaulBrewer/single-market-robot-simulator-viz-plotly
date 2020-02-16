@@ -792,7 +792,8 @@ var helpers = {
       var layout = _deepmerge["default"].all([getLayout({
         title: chart.title,
         xs: chart.vars[0],
-        ys: chart.vars[1]
+        ys: chart.vars[1],
+        sim: sim
       }), {
         showlegend: false,
         margin: {
@@ -841,22 +842,22 @@ var helpers = {
     return function (sim) {
       var extracted = extract(sim.logs.profit);
       var column = (0, _transpluck["default"])(extracted);
-      var profitHeader = [].concat(numberedStringArray('Buyer', sim.config.numberOfBuyers), numberedStringArray('Seller', sim.config.numberOfSellers));
+      var profitHeader = [].concat(numberedStringArray('B', sim.config.numberOfBuyers), numberedStringArray('S', sim.config.numberOfSellers));
       var data = profitHeader.map(function (name, j) {
         return {
           y: column['y' + j],
-          name: name + '<br>' + sim.pool.agents[j].constructor.name,
+          name: name,
+          legendgroup: sim.pool.agents[j].constructor.name,
           type: 'violin',
           meanline: {
             visible: true
-          },
-          showlegend: false
+          }
         };
       });
       var layout = getLayout({
         title: chart.title,
         ys: 'Profit',
-        xs: 'caseId'
+        sim: sim
       });
       return [data, layout];
     };
