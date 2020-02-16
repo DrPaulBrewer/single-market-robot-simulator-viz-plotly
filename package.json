@@ -10,7 +10,7 @@
     "lint": "node_modules/.bin/eslint src/index.js",
     "test": "nyc --reporter=text mocha --require @babel/register --slow 50 --timeout 300000 ",
     "coverage": "nyc --reporter=text-lcov --require @babel/register mocha --timeout 300000 | coveralls ",
-    "go": "npm run clean && npm run lint && npm run build"
+    "go": "npm run clean && npm run lint && npm test && npm run build"
   },
   "repository": {
     "type": "git",

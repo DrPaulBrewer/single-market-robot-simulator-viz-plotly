@@ -9,6 +9,7 @@ exports.getSampleSize = getSampleSize;
 exports.setFilter = setFilter;
 exports.getFilter = getFilter;
 exports.plotFactory = plotFactory;
+exports.competitiveEquilibriumModel = competitiveEquilibriumModel;
 exports.build = build;
 exports.helpers = exports.VisualizationFactory = exports.Visualization = exports.PlotlyDataLayoutConfig = void 0;
 
@@ -444,6 +445,14 @@ function plotFactory(chart) {
     return [traces, layout];
   };
 }
+
+function competitiveEquilibriumModel(_ref2) {
+  var demand = _ref2.demand,
+      supply = _ref2.supply;
+  var ceModel = marketPricing.crossSingleUnitDemandAndSupply(demand, supply);
+  ceModel.summary = ceModel && ceModel.p && ceModel.q ? 'CE: ' + JSON.stringify(ceModel) : '';
+  return ceModel;
+}
 /* this exports all the functions below, and also assigns them to the helpers object.
  * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
  */
@@ -469,8 +478,10 @@ var helpers = {
         supplyCosts.push(h + 1);
       }
 
-      var ceModel = marketPricing.crossSingleUnitDemandAndSupply(demandValues, supplyCosts);
-      var ceResult = ceModel && ceModel.p && ceModel.q ? 'CE: ' + JSON.stringify(ceModel) : '';
+      var ceModel = competitiveEquilibriumModel({
+        demand: demandValues,
+        supply: supplyCosts
+      });
       var maxlen = Math.max(demandValues.length, supplyCosts.length);
       var minlen = Math.min(demandValues.length, supplyCosts.length);
       var steps = maxlen <= 30;
@@ -556,11 +567,12 @@ var helpers = {
           }
         },
         title: {
-          text: " S/D Model <br>Case " + sim.config.caseid + "<br><sub>" + ceResult + "</sub>"
+          text: " S/D Model <br>Case " + sim.config.caseid + "<br><sub>" + ceModel.summary + "</sub>"
         }
       }]);
 
-      var plotlyData = [demand, supply].map(_stepifyPlotly["default"]);
+      var plotlyData = [demand, supply];
+      if (mode.startsWith('lines')) plotlyData = plotlyData.map(_stepifyPlotly["default"]);
       return [plotlyData, layout];
     };
   },
@@ -660,7 +672,7 @@ var helpers = {
           name: name,
           x: x,
           type: 'histogram',
-          opacity: 0.60,
+          opacity: 0.40,
           nbinsx: nbinsxDefault
         };
       });
@@ -734,8 +746,8 @@ var helpers = {
         name: 'points',
         marker: {
           color: 'rgb(102,0,0)',
-          size: 2,
-          opacity: 0.4
+          size: 4,
+          opacity: 0.5
         }
       }, chart.points);
       var density = Object.assign({}, {
@@ -771,10 +783,11 @@ var helpers = {
         zeroline: false
       }, chart.axiscommon);
 
-      var layout = _deepmerge["default"].all([defaultLayout, {
-        title: {
-          text: chart.title + caseIdAnnotation(sim.config && sim.config.caseid)
-        },
+      var layout = _deepmerge["default"].all([getLayout({
+        title: chart.title,
+        xs: chart.vars[0],
+        ys: chart.vars[1]
+      }), {
         showlegend: false,
         margin: {
           t: 50
@@ -820,34 +833,26 @@ var helpers = {
   },
   plotProfitTimeSeries: function plotProfitTimeSeries(chart) {
     return function (sim) {
-      var numberOfPeriods = sim.logs.profit.data.length;
-      var periods = [];
-
-      for (var i = 1, l = numberOfPeriods; i <= l; ++i) {
-        periods.push(i);
-      }
-
-      var profitHeader = [];
-
-      for (var _i4 = 1, _l3 = sim.numberOfBuyers; _i4 <= _l3; ++_i4) {
-        profitHeader.push('Buyer' + _i4);
-      }
-
-      for (var _i5 = 1, _l4 = sim.numberOfSellers; _i5 <= _l4; ++_i5) {
-        profitHeader.push('Seller' + _i5);
-      }
-
-      var profitsByAgent = (0, _transpluck["default"])(sim.logs.profit.data, profitHeader);
+      var extracted = extract(sim.logs.profit);
+      var column = (0, _transpluck["default"])(extracted);
       var traces = [];
 
-      for (var _i6 = 0, _l5 = sim.numberOfAgents; _i6 < _l5; ++_i6) {
+      function numbered(s, n) {
+        return new Array(n).fill(0).map(function (z, j) {
+          return s + (+1 + j);
+        });
+      }
+
+      var profitHeader = [].concat(numbered('Buyer', sim.config.numberOfBuyers), numbered('Seller', sim.config.numberOfSellers));
+
+      for (var i = 0, l = sim.numberOfAgents; i < l; ++i) {
         traces.push({
-          x: periods,
-          y: profitsByAgent[profitHeader[_i6]],
-          name: profitHeader[_i6],
+          x: column.period,
+          y: column['y' + i],
+          name: profitHeader[i],
           mode: 'markers',
           marker: {
-            symbol: _i6 < sim.numberOfBuyers ? "circle" : "square"
+            symbol: i < sim.numberOfBuyers ? "circle" : "square"
           },
           type: 'scatter'
         });

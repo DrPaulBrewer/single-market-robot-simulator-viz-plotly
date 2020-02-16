@@ -274,9 +274,16 @@ export function plotFactory(chart) {
   };
 }
 
+export function competitiveEquilibriumModel({demand,supply}){
+  const ceModel = marketPricing.crossSingleUnitDemandAndSupply(demand,supply);
+  ceModel.summary = (ceModel && ceModel.p && ceModel.q)? ('CE: '+JSON.stringify(ceModel)): '';
+  return ceModel;
+}
+
 /* this exports all the functions below, and also assigns them to the helpers object.
  * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
  */
+
 
 export const helpers = {
 
@@ -291,8 +298,10 @@ export const helpers = {
       if (supplyCosts[supplyCosts.length-1]<=h){
         supplyCosts.push(h+1);
       }
-      const ceModel = marketPricing.crossSingleUnitDemandAndSupply(demandValues,supplyCosts);
-      const ceResult = (ceModel && ceModel.p && ceModel.q)? ('CE: '+JSON.stringify(ceModel)): '';
+      const ceModel = competitiveEquilibriumModel({
+        demand: demandValues,
+        supply: supplyCosts
+      });
       const maxlen = Math.max(demandValues.length, supplyCosts.length);
       const minlen = Math.min(demandValues.length, supplyCosts.length);
       const steps = (maxlen<=30);
@@ -362,11 +371,12 @@ export const helpers = {
             }
           },
           title: {
-            text: " S/D Model <br>Case "+sim.config.caseid+"<br><sub>"+ceResult+"</sub>"
+            text: " S/D Model <br>Case "+sim.config.caseid+"<br><sub>"+ceModel.summary+"</sub>"
           }
         }
       ]);
-      let plotlyData = [demand, supply].map(stepify);
+      let plotlyData = [demand, supply];
+      if (mode.startsWith('lines')) plotlyData = plotlyData.map(stepify);
       return [plotlyData, layout];
     };
   },
@@ -375,7 +385,6 @@ export const helpers = {
 
   boxplotFactory(chart) {
     // requires log, y, input='study'
-
     return function (sims) {
       if (!Array.isArray(sims))
         throw new Error("boxplot requires an array of multiple simulations");
@@ -465,7 +474,7 @@ export const helpers = {
           name,
           x,
           type: 'histogram',
-          opacity: 0.60,
+          opacity: 0.40,
           nbinsx: nbinsxDefault
         };
       });
@@ -531,8 +540,8 @@ export const helpers = {
           name: 'points',
           marker: {
             color: 'rgb(102,0,0)',
-            size: 2,
-            opacity: 0.4
+            size: 4,
+            opacity: 0.5
           }
         },
         chart.points
@@ -580,11 +589,12 @@ export const helpers = {
       );
 
       let layout = deepmerge.all([
-        defaultLayout,
+        getLayout({
+          title: chart.title,
+          xs: chart.vars[0],
+          ys: chart.vars[1]
+        }),
         {
-          title: {
-            text: chart.title+caseIdAnnotation(sim.config && sim.config.caseid)
-          },
           showlegend: false,
           margin: { t: 50 },
           hovermode: 'closest',
@@ -637,21 +647,24 @@ export const helpers = {
 
   plotProfitTimeSeries(chart) {
     return function (sim) {
-      const numberOfPeriods = sim.logs.profit.data.length;
-      const periods = [];
-      for (let i = 1, l = numberOfPeriods;i<=l;++i)
-        periods.push(i);
-      const profitHeader = [];
-      for (let i = 1, l = sim.numberOfBuyers;i<=l;++i)
-        profitHeader.push('Buyer' + i);
-      for (let i = 1, l = sim.numberOfSellers;i<=l;++i)
-        profitHeader.push('Seller' + i);
-      const profitsByAgent = transpluck(sim.logs.profit.data, profitHeader);
+      const extracted = extract(sim.logs.profit);
+      const column = transpluck(extracted);
       const traces = [];
+      function numbered(s,n){
+        return (
+          new Array(n)
+          .fill(0)
+          .map((z,j)=>(s+(+1+j)))
+        );
+      }
+      const profitHeader = [].concat(
+        numbered('Buyer',sim.config.numberOfBuyers),
+        numbered('Seller',sim.config.numberOfSellers)
+      );
       for (let i = 0, l = sim.numberOfAgents;i<l;++i)
         traces.push({
-          x: periods,
-          y: profitsByAgent[profitHeader[i]],
+          x: column.period,
+          y: column['y'+i],
           name: profitHeader[i],
           mode: 'markers',
           marker: {
