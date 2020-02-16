@@ -8,6 +8,7 @@ import stepify from 'stepify-plotly';
 import clone from 'clone';
 import deepmerge from 'deepmerge';
 import decamelize from 'decamelize';
+import arrayUniq from 'array-uniq';
 import * as Random from 'random-js';
 import * as marketPricing from 'market-pricing';
 
@@ -662,15 +663,22 @@ export const helpers = {
           numberedStringArray('B',sim.config.numberOfBuyers),
           numberedStringArray('S',sim.config.numberOfSellers)
         );
+        const agentTypes = sim.pool.agents.map((a)=>(a.constructor.name));
+        const colors = ['blue','green','red','orange','yellow','violet','brown'];
+        const uniqueAgentTypes = arrayUniq(agentTypes);
+        const agentColors = agentTypes.map((atype)=>(colors[uniqueAgentTypes.indexOf(atype) % colors.length]));
         const data = profitHeader.map((name,j)=>(
           {
             y: column['y'+j],
-            x: name,
-            legendgroup: sim.pool.agents[j].constructor.name,
+            name,
             type: 'violin',
             meanline: {
               visible: true
-            }
+            },
+            line: {
+              color: agentColors[j]
+            },
+            showlegend: false
           }
         ));
         const layout = getLayout({

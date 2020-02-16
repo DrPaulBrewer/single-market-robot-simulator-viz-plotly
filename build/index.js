@@ -25,6 +25,8 @@ var _deepmerge = _interopRequireDefault(require("deepmerge"));
 
 var _decamelize = _interopRequireDefault(require("decamelize"));
 
+var _arrayUniq = _interopRequireDefault(require("array-uniq"));
+
 var Random = _interopRequireWildcard(require("random-js"));
 
 var marketPricing = _interopRequireWildcard(require("market-pricing"));
@@ -843,15 +845,26 @@ var helpers = {
       var extracted = extract(sim.logs.profit);
       var column = (0, _transpluck["default"])(extracted);
       var profitHeader = [].concat(numberedStringArray('B', sim.config.numberOfBuyers), numberedStringArray('S', sim.config.numberOfSellers));
+      var agentTypes = sim.pool.agents.map(function (a) {
+        return a.constructor.name;
+      });
+      var colors = ['blue', 'green', 'red', 'orange', 'yellow', 'violet', 'brown'];
+      var uniqueAgentTypes = (0, _arrayUniq["default"])(agentTypes);
+      var agentColors = agentTypes.map(function (atype) {
+        return colors[uniqueAgentTypes.indexOf(atype) % colors.length];
+      });
       var data = profitHeader.map(function (name, j) {
         return {
           y: column['y' + j],
-          x: name,
-          legendgroup: sim.pool.agents[j].constructor.name,
+          name: name,
           type: 'violin',
           meanline: {
             visible: true
-          }
+          },
+          line: {
+            color: agentColors[j]
+          },
+          showlegend: false
         };
       });
       var layout = getLayout({
