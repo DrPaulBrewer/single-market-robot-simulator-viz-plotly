@@ -317,7 +317,7 @@ export const helpers = {
       const type = 'scatter';
       const cutoff = Math.min(minlen+10,maxlen);
       const idxStep = Math.max(1,Math.ceil(minlen/50));
-      const xD=[],yD=[],xS=[],yS=[];
+      const xD=[0],yD=[h+1],xS=[0],yS=[0];
       function include(i){
         if (i<0) return;
         if(i<demandValues.length){
@@ -341,10 +341,12 @@ export const helpers = {
       }
       for(let i=0,l=q0-1;i<l;i+=idxStep)
         include(i);
-      for(let i=q0-1,l=q1-1;i<l;i+=Math.min(q1-q0,idxStep))
-        include(i);
-      for (let i=q1-1,l=cutoff;i<l;i+=Math.min(cutoff-q1,idxStep))
-        include(i);
+      if (q1>q0)
+        for(let i=q0-1,l=q1-1;i<l;i+=Math.min(q1-q0,idxStep))
+          include(i);
+      if (cutoff>q1)
+        for (let i=q1-1,l=cutoff;i<l;i+=Math.min(cutoff-q1,idxStep))
+          include(i);
 
       let demand = {
         name: 'demand',
@@ -363,7 +365,7 @@ export const helpers = {
         steps
       };
       let layout = deepmerge.all([
-        clone(defaultLayout),
+        defaultLayout,
         { yaxis:{
             range: [0, sim.config.H],
             title: {

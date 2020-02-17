@@ -1,0 +1,75 @@
+{
+  "buyerValues": [
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800,
+    800
+  ],
+  "sellerCosts": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200
+  ],
+  "numberOfBuyers": 10,
+  "numberOfSellers": 10,
+  "buyerRate": [
+    0.2
+  ],
+  "sellerRate": [
+    0.2
+  ],
+  "buyerAgentType": [
+    "ZIAgent"
+  ],
+  "sellerAgentType": [
+    "ZIAgent"
+  ],
+  "keepPreviousOrders": false,
+  "ignoreBudgetConstraint": false,
+  "xMarket": {
+    "buySellBookLimit": 0,
+    "resetAfterEachTrade": false
+  },
+  "caseid": 0,
+  "periods": 100,
+  "L": 1,
+  "H": 1000,
+  "periodDuration": 1000,
+  "integer": true,
+  "silent": true,
+  "version": 2,
+  "withoutOrderLogs": false
+}

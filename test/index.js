@@ -7,13 +7,14 @@ import assert from 'assert';
 import 'should';
 import * as VIZ from '../src/index.js';
 import * as singleMarketRobotSimulator from 'single-market-robot-simulator';
-import config1 from './config1.json';
-import config2 from './config2.json';
+import config1 from './sim1.json';
+import config2 from './sim2.json';
+import config3 from './sim3.json';
 import dataVisuals from './dataVisuals.json';
 
 const { Simulation } = singleMarketRobotSimulator;
 
-let sim1,sim2;
+let sim1,sim2,sim3;
 let visuals;
 
 describe('run Example simulations', function(){
@@ -22,6 +23,9 @@ describe('run Example simulations', function(){
   });
   it('should run and finish sim2', function(){
     sim2 = new Simulation(config2).run({sync:true});
+  });
+  it('should run and finish sim3', function(){
+    sim3 = new Simulation(config3).run({sync:true});
   });
 });
 
@@ -52,7 +56,7 @@ describe('visualizations', function(){
       let vLoaded;
       try {
         vLoaded = v.load({
-          from: [sim1,sim2]
+          from: [sim1,sim2,sim3]
         });
       } catch(e){
         e.message = 'visual '+v.meta.title+': Function :'+v.meta.f+': Error :'+e.message;
@@ -62,7 +66,7 @@ describe('visualizations', function(){
         return testSingleLoadedViz(v,vLoaded);
       }
       assert(Array.isArray(vLoaded), "detail visualization should yield an array ");
-      vLoaded.length.should.equal(2);
+      vLoaded.length.should.equal(3);
       vLoaded.forEach((vl)=>(testSingleLoadedViz(v,vl)));
     });
   });

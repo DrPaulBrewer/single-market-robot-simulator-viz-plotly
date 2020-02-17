@@ -495,10 +495,10 @@ var helpers = {
       var type = 'scatter';
       var cutoff = Math.min(minlen + 10, maxlen);
       var idxStep = Math.max(1, Math.ceil(minlen / 50));
-      var xD = [],
-          yD = [],
-          xS = [],
-          yS = [];
+      var xD = [0],
+          yD = [h + 1],
+          xS = [0],
+          yS = [0];
 
       function include(i) {
         if (i < 0) return;
@@ -533,14 +533,12 @@ var helpers = {
         include(i);
       }
 
-      for (var _i2 = q0 - 1, _l = q1 - 1; _i2 < _l; _i2 += Math.min(q1 - q0, idxStep)) {
+      if (q1 > q0) for (var _i2 = q0 - 1, _l = q1 - 1; _i2 < _l; _i2 += Math.min(q1 - q0, idxStep)) {
         include(_i2);
       }
-
-      for (var _i3 = q1 - 1, _l2 = cutoff; _i3 < _l2; _i3 += Math.min(cutoff - q1, idxStep)) {
+      if (cutoff > q1) for (var _i3 = q1 - 1, _l2 = cutoff; _i3 < _l2; _i3 += Math.min(cutoff - q1, idxStep)) {
         include(_i3);
       }
-
       var demand = {
         name: 'demand',
         x: xD,
@@ -558,7 +556,7 @@ var helpers = {
         steps: steps
       };
 
-      var layout = _deepmerge["default"].all([(0, _clone["default"])(defaultLayout), {
+      var layout = _deepmerge["default"].all([defaultLayout, {
         yaxis: {
           range: [0, sim.config.H],
           title: {
