@@ -106,8 +106,8 @@ function () {
       }
 
       if (layout.title && layout.title.text) {
-        if (modifier.prepend && modifier.prepend.length > 0) layout.title.text = modifier.prepend + layout.title;
-        if (modifier.append && modifier.append.length > 0) layout.title.text += modifier.append;
+        if (modifier.prepend && modifier.prepend.length > 0) layout.title.text = modifier.prepend + '<br>' + layout.title;
+        if (modifier.append && modifier.append.length > 0) layout.title.text += '<br>' + modifier.append;
       }
 
       return this;
