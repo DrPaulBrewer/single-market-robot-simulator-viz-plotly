@@ -478,10 +478,10 @@ var helpers = {
         demandValues.push(0);
       }
 
-      var h = sim.config.h || 200;
+      var H = +sim.config.H;
 
-      if (supplyCosts[supplyCosts.length - 1] <= h) {
-        supplyCosts.push(h + 1);
+      if (supplyCosts[supplyCosts.length - 1] <= H) {
+        supplyCosts.push(H + 1);
       }
 
       var ceModel = competitiveEquilibriumModel({
@@ -496,7 +496,7 @@ var helpers = {
       var cutoff = Math.min(minlen + 10, maxlen);
       var idxStep = Math.max(1, Math.ceil(minlen / 50));
       var xD = [0],
-          yD = [h + 1],
+          yD = [H + 1],
           xS = [0],
           yS = [0];
 
