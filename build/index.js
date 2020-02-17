@@ -553,10 +553,14 @@ var helpers = {
         include(i);
       }
 
-      if (q1 > q0) for (var _i2 = q0 - 1, _l = q1 - 1; _i2 < _l; _i2 += Math.min(q1 - q0, idxStep)) {
+      include(q0 - 1);
+
+      for (var _i2 = q0, _l = q1 - 1; _i2 < _l; _i2 += idxStep) {
         include(_i2);
       }
-      if (cutoff > q1) for (var _i3 = q1 - 1, _l2 = cutoff; _i3 < _l2; _i3 += Math.min(cutoff - q1, idxStep)) {
+
+      include(q1 - 1);
+      if (cutoff > q1) for (var _i3 = q1, _l2 = cutoff; _i3 < _l2; _i3 += Math.min(cutoff - q1, idxStep)) {
         include(_i3);
       }
       var demand = {
@@ -576,7 +580,7 @@ var helpers = {
 
       var layout = _deepmerge["default"].all([defaultLayout, {
         yaxis: {
-          range: [0, sim.config.H],
+          range: [0, H],
           title: {
             text: "P"
           }

@@ -356,11 +356,12 @@ export const helpers = {
       }
       for(let i=0,l=q0-1;i<l;i+=idxStep)
         include(i);
-      if (q1>q0)
-        for(let i=q0-1,l=q1-1;i<l;i+=Math.min(q1-q0,idxStep))
-          include(i);
+      include(q0-1);
+      for(let i=q0,l=q1-1;i<l;i+=idxStep)
+        include(i);
+      include(q1-1);
       if (cutoff>q1)
-        for (let i=q1-1,l=cutoff;i<l;i+=Math.min(cutoff-q1,idxStep))
+        for (let i=q1,l=cutoff;i<l;i+=Math.min(cutoff-q1,idxStep))
           include(i);
 
       let demand = {
@@ -380,7 +381,7 @@ export const helpers = {
       let layout = deepmerge.all([
         defaultLayout,
         { yaxis:{
-            range: [0, sim.config.H],
+            range: [0, H],
             title: {
               text: "P"
             }
