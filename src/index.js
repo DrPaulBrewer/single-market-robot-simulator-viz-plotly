@@ -302,9 +302,9 @@ export const helpers = {
       if (demandValues[demandValues.length-1]>0){
         demandValues.push(0);
       }
-      const h = sim.config.h || 200;
-      if (supplyCosts[supplyCosts.length-1]<=h){
-        supplyCosts.push(h+1);
+      const H = +sim.config.H;
+      if (supplyCosts[supplyCosts.length-1]<=H){
+        supplyCosts.push(H+1);
       }
       const ceModel = competitiveEquilibriumModel({
         demand: demandValues,
@@ -317,7 +317,7 @@ export const helpers = {
       const type = 'scatter';
       const cutoff = Math.min(minlen+10,maxlen);
       const idxStep = Math.max(1,Math.ceil(minlen/50));
-      const xD=[0],yD=[h+1],xS=[0],yS=[0];
+      const xD=[0],yD=[H+1],xS=[0],yS=[0];
       function include(i){
         if (i<0) return;
         if(i<demandValues.length){
