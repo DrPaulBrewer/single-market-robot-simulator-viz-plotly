@@ -33,7 +33,6 @@
     "deepmerge": "^4.2.2",
     "market-pricing": "^1.5.0",
     "random-js": "^2.1.0",
-    "stepify-plotly": "^1.0.6",
     "transpluck": "^1.0.4"
   },
   "devDependencies": {
@@ -47,7 +46,7 @@
     "mocha": "^7.0.1",
     "nyc": "^15.0.0",
     "should": "^13.2.3",
-    "single-market-robot-simulator": "^5.12.0"
+    "single-market-robot-simulator": "^5.14.0"
   },
   "jsnext:main": "src/index.js"
 }

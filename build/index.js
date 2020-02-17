@@ -17,8 +17,6 @@ var d3A = _interopRequireWildcard(require("d3-array"));
 
 var _transpluck = _interopRequireDefault(require("transpluck"));
 
-var _stepifyPlotly = _interopRequireDefault(require("stepify-plotly"));
-
 var _clone = _interopRequireDefault(require("clone"));
 
 var _deepmerge = _interopRequireDefault(require("deepmerge"));
@@ -478,7 +476,7 @@ var helpers = {
         demandValues.push(0);
       }
 
-      var H = +sim.config.H;
+      var H = Math.max(+sim.config.H, demandValues[0], supplyCosts[supplyCosts.length - 1]);
 
       if (supplyCosts[supplyCosts.length - 1] <= H) {
         supplyCosts.push(H + 1);
@@ -491,7 +489,7 @@ var helpers = {
       var maxlen = Math.max(demandValues.length, supplyCosts.length);
       var minlen = Math.min(demandValues.length, supplyCosts.length);
       var steps = maxlen <= 30;
-      var mode = maxlen <= 30 ? 'lines+markers' : 'markers';
+      var mode = steps ? 'lines+markers' : 'markers';
       var type = 'scatter';
       var cutoff = Math.min(minlen + 10, maxlen);
       var idxStep = Math.max(1, Math.ceil(minlen / 50));
@@ -504,13 +502,35 @@ var helpers = {
         if (i < 0) return;
 
         if (i < demandValues.length) {
+          var dVal = demandValues[i];
+
+          if (steps) {
+            var prev = yD[yD.length - 1];
+
+            if (dVal !== prev) {
+              xD.push(i);
+              yD.push(dVal);
+            }
+          }
+
           xD.push(i + 1);
-          yD.push(demandValues[i]);
+          yD.push(dVal);
         }
 
         if (i < supplyCosts.length) {
+          var sCost = supplyCosts[i];
+
+          if (steps) {
+            var _prev = yS[yS.length - 1];
+
+            if (sCost !== _prev) {
+              xS.push(i);
+              yS.push(sCost);
+            }
+          }
+
           xS.push(i + 1);
-          yS.push(supplyCosts[i]);
+          yS.push(sCost);
         }
       }
 
@@ -544,16 +564,14 @@ var helpers = {
         x: xD,
         y: yD,
         mode: mode,
-        type: type,
-        steps: steps
+        type: type
       };
       var supply = {
         name: 'supply',
         x: xS,
         y: yS,
         mode: mode,
-        type: type,
-        steps: steps
+        type: type
       };
 
       var layout = _deepmerge["default"].all([defaultLayout, {
@@ -576,7 +594,6 @@ var helpers = {
       }]);
 
       var plotlyData = [demand, supply];
-      if (mode.startsWith('lines')) plotlyData = plotlyData.map(_stepifyPlotly["default"]);
       return [plotlyData, layout];
     };
   },

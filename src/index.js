@@ -4,7 +4,6 @@
 
 import * as d3A from 'd3-array';
 import transpluck from 'transpluck';
-import stepify from 'stepify-plotly';
 import clone from 'clone';
 import deepmerge from 'deepmerge';
 import decamelize from 'decamelize';
@@ -302,7 +301,7 @@ export const helpers = {
       if (demandValues[demandValues.length-1]>0){
         demandValues.push(0);
       }
-      const H = +sim.config.H;
+      const H = Math.max(+sim.config.H,demandValues[0],supplyCosts[supplyCosts.length-1]);
       if (supplyCosts[supplyCosts.length-1]<=H){
         supplyCosts.push(H+1);
       }
@@ -313,7 +312,7 @@ export const helpers = {
       const maxlen = Math.max(demandValues.length, supplyCosts.length);
       const minlen = Math.min(demandValues.length, supplyCosts.length);
       const steps = (maxlen<=30);
-      const mode = (maxlen<=30)? 'lines+markers' : 'markers';
+      const mode = steps? 'lines+markers' : 'markers';
       const type = 'scatter';
       const cutoff = Math.min(minlen+10,maxlen);
       const idxStep = Math.max(1,Math.ceil(minlen/50));
@@ -321,12 +320,28 @@ export const helpers = {
       function include(i){
         if (i<0) return;
         if(i<demandValues.length){
+          const dVal = demandValues[i];
+          if (steps) {
+            const prev = yD[yD.length-1];
+            if (dVal!==prev){
+              xD.push(i);
+              yD.push(dVal);
+            }
+          }
           xD.push(i+1);
-          yD.push(demandValues[i]);
+          yD.push(dVal);
         }
         if(i<supplyCosts.length){
+          const sCost = supplyCosts[i];
+          if (steps){
+            const prev = yS[yS.length-1];
+            if (sCost!==prev){
+              xS.push(i);
+              yS.push(sCost);
+            }
+          }
           xS.push(i+1);
-          yS.push(supplyCosts[i]);
+          yS.push(sCost);
         }
       }
       let q0,q1;
@@ -353,16 +368,14 @@ export const helpers = {
         x: xD,
         y: yD,
         mode,
-        type,
-        steps
+        type
       };
       let supply = {
         name: 'supply',
         x: xS,
         y: yS,
         mode,
-        type,
-        steps
+        type
       };
       let layout = deepmerge.all([
         defaultLayout,
@@ -386,7 +399,6 @@ export const helpers = {
         }
       ]);
       let plotlyData = [demand, supply];
-      if (mode.startsWith('lines')) plotlyData = plotlyData.map(stepify);
       return [plotlyData, layout];
     };
   },
