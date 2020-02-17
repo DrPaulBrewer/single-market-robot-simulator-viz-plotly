@@ -1,6 +1,6 @@
 {
   "name": "single-market-robot-simulator-viz-plotly",
-  "version": "4.5.0",
+  "version": "4.5.1",
   "description": "middleware for generating charts with plotly from single-market-robot-simulator simulation logs",
   "main": "build/index.js",
   "scripts": {
