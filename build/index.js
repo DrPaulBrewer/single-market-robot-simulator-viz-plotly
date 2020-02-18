@@ -884,7 +884,8 @@ var helpers = {
           line: {
             color: agentColors[j]
           },
-          showlegend: false
+          legendgroup: sim.pool.agents[j].constructor.name,
+          showlegend: true
         };
       });
       var layout = getLayout({

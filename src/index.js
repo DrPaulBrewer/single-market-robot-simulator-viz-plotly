@@ -692,7 +692,8 @@ export const helpers = {
             line: {
               color: agentColors[j]
             },
-            showlegend: false
+            legendgroup: sim.pool.agents[j].constructor.name,
+            showlegend: true
           }
         ));
         const layout = getLayout({
