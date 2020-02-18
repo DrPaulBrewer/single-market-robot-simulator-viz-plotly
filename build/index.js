@@ -669,7 +669,8 @@ var helpers = {
           meanline: {
             visible: true
           },
-          showlegend: false
+          showlegend: false,
+          spanmode: "hard"
         };
       });
       var layout = getLayout({
@@ -876,7 +877,7 @@ var helpers = {
       var data = profitHeader.map(function (name, j) {
         return {
           y: column['y' + (j + 1)],
-          name: name,
+          name: name + '<br>' + sim.pool.agents[j].constructor.name.replace('Agent', '').substr(0, 5),
           type: 'violin',
           meanline: {
             visible: true
@@ -884,8 +885,8 @@ var helpers = {
           line: {
             color: agentColors[j]
           },
-          legendgroup: sim.pool.agents[j].constructor.name,
-          showlegend: true
+          spanmode: "hard",
+          showlegend: false
         };
       });
       var layout = getLayout({
