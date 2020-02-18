@@ -341,17 +341,21 @@ function axisRange(vs, sim) {
   }
 }
 
-function caseIdAnnotation(caseid) {
-  return caseid === undefined ? '' : "<br>case: ".concat(caseid);
+function annotation(_ref) {
+  var caseid = _ref.caseid,
+      tag = _ref.tag;
+  var a1 = caseid === undefined ? '' : "case:".concat(caseid, " ");
+  var a2 = tag === undefined ? '' : tag;
+  return a1 || a2 ? '<br>' + a1 + a2 : '';
 }
 
-function getLayout(_ref) {
-  var xs = _ref.xs,
-      ys = _ref.ys,
-      title = _ref.title,
-      sim = _ref.sim,
-      xrange = _ref.xrange,
-      yrange = _ref.yrange;
+function getLayout(_ref2) {
+  var xs = _ref2.xs,
+      ys = _ref2.ys,
+      title = _ref2.title,
+      sim = _ref2.sim,
+      xrange = _ref2.xrange,
+      yrange = _ref2.yrange;
   var items = [defaultLayout];
 
   function xaxis(obj) {
@@ -367,9 +371,13 @@ function getLayout(_ref) {
   }
 
   var caseid = sim && sim.config && sim.config.caseid;
+  var tag = sim && sim.config && sim.config.tag;
   items.push({
     title: {
-      text: (title || '') + caseIdAnnotation(caseid)
+      text: (title || '') + annotation({
+        caseid: caseid,
+        tag: tag
+      })
     }
   });
 
@@ -444,9 +452,9 @@ function plotFactory(chart) {
   };
 }
 
-function competitiveEquilibriumModel(_ref2) {
-  var demand = _ref2.demand,
-      supply = _ref2.supply;
+function competitiveEquilibriumModel(_ref3) {
+  var demand = _ref3.demand,
+      supply = _ref3.supply;
   var ceModel = marketPricing.crossSingleUnitDemandAndSupply(demand, supply);
   ceModel.summary = ceModel && ceModel.p && ceModel.q ? 'CE: ' + JSON.stringify(ceModel) : '';
   return ceModel;
@@ -619,7 +627,7 @@ var helpers = {
           console.log(e);
         }
 
-        var name = '' + sim.config.caseid;
+        var name = '' + (sim.config.tag || sim.config.caseid);
         return {
           y: y,
           name: name,
@@ -653,7 +661,7 @@ var helpers = {
           console.log(e);
         }
 
-        var name = '' + sim.config.caseid;
+        var name = '' + (sim.config.tag || sim.config.caseid);
         return {
           y: y,
           name: name,

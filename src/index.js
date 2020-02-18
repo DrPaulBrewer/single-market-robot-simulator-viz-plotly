@@ -212,8 +212,10 @@ function axisRange(vs, sim){
     }
 }
 
-function caseIdAnnotation(caseid){
-  return (caseid===undefined)? '': (`<br>case: ${caseid}`);
+function annotation({caseid, tag}){
+  const a1 = (caseid===undefined)? '': (`case:${caseid} `);
+  const a2 = (tag===undefined)? '': tag;
+  return (a1 || a2)? ('<br>'+a1+a2) : '';
 }
 
 function getLayout({xs,ys,title,sim,xrange,yrange}){
@@ -221,7 +223,8 @@ function getLayout({xs,ys,title,sim,xrange,yrange}){
   function xaxis(obj){ if (obj) items.push({xaxis: obj}); }
   function yaxis(obj){ if (obj) items.push({yaxis: obj}); }
   const caseid = sim && sim.config && sim.config.caseid;
-  items.push({ title: { text: (title || '')+caseIdAnnotation(caseid) } });
+  const tag = sim && sim.config && sim.config.tag;
+  items.push({ title: { text: (title || '')+annotation({caseid,tag}) } });
   if (xs){
     xaxis(axisTitle(xs));
     xaxis(xrange? ({range: xrange}) : (axisRange(xs,sim)));
@@ -420,7 +423,7 @@ export const helpers = {
           console.log("boxplotFactory: error, no data for simulation "+j);
           console.log(e);
         }
-        const name = ''+sim.config.caseid;
+        const name = ''+(sim.config.tag || sim.config.caseid);
         return {
           y,
           name,
@@ -453,7 +456,7 @@ export const helpers = {
           console.log("violinFactory: error, no data for simulation "+j);
           console.log(e);
         }
-        const name = ''+sim.config.caseid;
+        const name = ''+(sim.config.tag || sim.config.caseid);
         return {
           y,
           name,
