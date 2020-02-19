@@ -1,74 +1,70 @@
 [
   {
-    "f": "supplyDemand",
-    "title": "[model] CE Model: Demand and Supply from buyerValues/sellerCosts"
-  },
-  {
     "f": "violinFactory",
-    "title": "[v] Trade price distribution vs. caseid",
+    "title": "[v] Compare Trade price distributions",
     "input": "study",
     "log": "trade",
     "y": "price"
   },
   {
     "f": "violinFactory",
-    "title": "[v] Closing price distribution vs. caseid",
+    "title": "[v] Compare Closing price distributions",
     "input": "study",
     "log":"ohlc",
     "y": "closePrice"
   },
   {
     "f": "violinFactory",
-    "title": "[v] Efficiency of Allocation vs. caseid",
+    "title": "[v] Compare Efficiency of Allocation",
     "input": "study",
     "log": "effalloc",
     "y": "efficiencyOfAllocation"
   },
   {
     "f": "violinFactory",
-    "title": "[v] Trading Volume per period vs. caseid",
+    "title": "[v] Compare Trade Volume distributions",
     "input": "study",
     "log": "ohlc",
     "y": "volume"
   },
   {
     "f": "violinFactory",
-    "title": "[v] Gini coefficient per period vs. caseid",
+    "title": "[v] Compare Gini coefficient distributions",
     "input": "study",
     "log": "ohlc",
     "y": "gini"
   },
   {
     "f": "boxplotFactory",
-    "title": "[b] Trade price distribution vs. caseid",
+    "title": "[b] Compare Trade price distributions",
     "input": "study",
     "log": "trade",
     "y": "price"
   },
   {
     "f": "boxplotFactory",
-    "title": "[b] Closing price distribution vs. caseid",
+    "title": "[b] Compare Closing price distributions",
     "input": "study",
     "log":"ohlc",
     "y": "closePrice"
   },
   {
     "f": "boxplotFactory",
-    "title": "[b] Efficiency of Allocation vs. caseid",
+    "title": "[b] Compare Efficiency of Allocation",
     "input": "study",
     "log": "effalloc",
     "y": "efficiencyOfAllocation"
   },
   {
     "f": "boxplotFactory",
-    "title": "[b] Trading Volume per period vs. caseid",
+    "title": "[b] Compare Trading Volume distributions",
     "input": "study",
     "log": "ohlc",
     "y": "volume"
   },
   {
     "f": "boxplotFactory",
-    "title":"[b] Gini coefficient per period vs. caseid",
+    "title":"[b] Compare Gini coefficient distributions",
     "input": "study",
     "log": "ohlc",
     "y": "gini"
@@ -90,16 +86,24 @@
     "modes": ["markers"]
   },
   {
-    "f": "plotOHLCTimeSeries",
-    "title": "[s] Period open,high,low,close trade prices vs. period"
+    "f": "plotFactory",
+    "title": "[s] Period open,high,low,close trade prices",
+    "log": "ohlc",
+    "names": ["open", "high", "low", "close"],
+    "xs": ["period"],
+    "ys": ["openPrice", "highPrice", "lowPrice", "closePrice"],
+    "modes": ["markers", "markers", "markers", "lines+markers"]
   },
   {
-    "f": "plotBidAskTradeTimeSeries",
-    "title": "[ts] Bid, Ask, Trade prices vs. time"
-  },
-  {
-    "f": "plotProfitTimeSeries",
-    "title": "[s] Profit of each agent vs. period"
+    "f": "plotFactory",
+    "title": "[ts] Bid, Ask, Trade prices vs. time",
+    "names": ["bids", "asks", "trades"],
+    "logs": ["buyorder", "sellorder", "trade"],
+    "modes": ["markers", "markers", "lines+markers"],
+    "xs": ["t"],
+    "ys": ["buyLimitPrice", "sellLimitPrice", "price"],
+    "agentcolors": ["id","id",""],
+    "symbols": ["triangle-up","triangle-down","circle"]
   },
   {
     "f": "plotFactory",
@@ -111,13 +115,21 @@
     "modes": ["markers"]
   },
   {
+    "f": "plotProfitDistributionViolin",
+    "title": "[v] Profit Distribution vs. Agent Id/Type"
+  },
+  {
     "f": "plotFactory",
-    "title": "[ts] trade profitability vs. time",
+    "title": "[ts] Trade profitability vs. time",
     "log": "trade",
     "names": ["trade","unit value","unit cost"],
     "xs": ["t"],
     "ys": ["price","buyerValue","sellerCost"],
     "modes": ["markers+lines","markers","markers"]
+  },
+  {
+    "f": "plotProfitTimeSeries",
+    "title": "[s] Profit of each agent vs. period"
   },
   {
     "f": "histogramFactory",
@@ -229,7 +241,7 @@
     "vars": ["buyLimitPrice", "sellLimitPrice", "buyLimitPrice", "sellLimitPrice"]
   },
   {
-    "f": "plotProfitDistributionViolin",
-    "title": "[v] Profit Distribution vs. Agent Id"
+    "f": "supplyDemand",
+    "title": "[model] CE Model: Demand and Supply from buyerValues/sellerCosts"
   }
 ]

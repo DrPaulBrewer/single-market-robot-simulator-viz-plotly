@@ -51,6 +51,10 @@ function tickText(primary, secondary) {
   return primary + '<br>' + secondary;
 }
 
+function getAgentColors(sim) {
+  return sim.pool.agents.map(a => a.color || 'darkviolet');
+}
+
 class PlotlyDataLayoutConfig {
   constructor(options) {
     this.data = options.data || [];
@@ -380,9 +384,10 @@ function getLayout(_ref2) {
 }
 
 function plotFactory(chart) {
-  /* chart properties are title, log or logs, names, xs, ys, modes, layout */
+  /* chart properties are title, log or logs, names, xs, ys, modes, symbols, agentcolors, layout */
   return function (sim) {
     let series = null;
+    const agentColorArray = getAgentColors(sim);
     if (chart.log) series = (0, _transpluck.default)(extract(sim.logs[chart.log]), {
       pluck: [].concat(chart.xs, chart.ys)
     });
@@ -390,21 +395,27 @@ function plotFactory(chart) {
       const type = 'scatter';
       const mode = chart.modes[i % chart.modes.length];
       let x = [],
-          y = [];
+          y = [],
+          marker = {},
+          color;
 
       try {
         const xvar = chart.xs[i % chart.xs.length];
         const yvar = chart.ys[i % chart.ys.length];
+        const agentcolorvar = Array.isArray(chart.agentcolors) && chart.agentcolors[i % chart.agentcolors.length];
+        marker.symbol = Array.isArray(chart.symbols) && chart.symbols[i] || "circle";
         const logName = Array.isArray(chart.logs) && chart.logs[i % chart.logs.length];
 
         if (logName) {
+          const pluckvars = [xvar, yvar, agentcolorvar].filter(v => v);
           series = (0, _transpluck.default)(extract(sim.logs[logName]), {
-            pluck: [xvar, yvar]
+            pluck: pluckvars
           });
         }
 
         x = series[xvar];
         y = series[yvar];
+        color = agentcolorvar && Array.isArray(series[agentcolorvar]) && series[agentcolorvar].map(id => agentColorArray[id]);
         if (!Array.isArray(x)) x = [];
         if (!Array.isArray(y)) y = [];
         if (x.length !== y.length) throw new Error("plotFactory: x and y series are of unequal length");
@@ -413,14 +424,17 @@ function plotFactory(chart) {
         console.log(e);
         x = [];
         y = [];
+        color = null;
       }
 
+      if (Array.isArray(color)) marker.color = color;
       return {
         name,
         mode,
         type,
         x,
-        y
+        y,
+        marker
       };
     });
     const layout = getLayout({
@@ -821,34 +835,12 @@ const helpers = {
     };
   },
 
-  plotOHLCTimeSeries() {
-    return plotFactory({
-      title: 'Open,High,Low,Close Trade prices for each period',
-      log: 'ohlc',
-      names: ['open', 'high', 'low', 'close'],
-      xs: ['period'],
-      ys: ['openPrice', 'highPrice', 'lowPrice', 'closePrice'],
-      modes: ['markers', 'markers', 'markers', 'lines+markers']
-    });
-  },
-
-  plotBidAskTradeTimeSeries() {
-    return plotFactory({
-      title: 'Bid,Ask,Trade time series',
-      names: ['bids', 'asks', 'trades'],
-      logs: ['buyorder', 'sellorder', 'trade'],
-      modes: ['markers', 'markers', 'lines+markers'],
-      xs: ['t'],
-      ys: ['buyLimitPrice', 'sellLimitPrice', 'price']
-    });
-  },
-
   plotProfitDistributionViolin(chart) {
     return function (sim) {
       const extracted = extract(sim.logs.profit);
       const column = (0, _transpluck.default)(extracted);
       const profitHeader = [].concat(numberedStringArray('B', sim.config.numberOfBuyers), numberedStringArray('S', sim.config.numberOfSellers));
-      const agentColors = sim.pool.agents.map(a => a.color || 'darkviolet');
+      const agentColors = getAgentColors(sim);
       const data = profitHeader.map((name, j) => ({
         y: column['y' + (j + 1)],
         name: tickText(name, sim.pool.agents[j].constructor.name.replace('Agent', '').substr(0, 5)),

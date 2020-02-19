@@ -45,7 +45,7 @@ describe('visualizations', function(){
       v.meta.should.deepEqual(dataVisuals[j]);
     });
   });
-  it('should run each visualization OK on [sim1,sim2] with minimal sanity checking of output', function(){
+  it('should run each visualization OK on [sim1,sim2,sim3] with minimal sanity checking of output', function(){
     function testSingleLoadedViz(v, vl){
       assert(vl instanceof VIZ.Visualization,"assert: vl is a VIZ.Visualization for "+v.meta.title);
       assert(Array.isArray(vl.data),"assert vl.data is an array for "+v.meta.title);
