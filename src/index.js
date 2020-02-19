@@ -10,6 +10,15 @@ import decamelize from 'decamelize';
 import * as Random from 'random-js';
 import * as marketPricing from 'market-pricing';
 
+function tickText(primary,secondary){
+    let width;
+    try {
+      width = +window.screen.availWidth || +window.screen.width;
+    } catch(e) {console.log(e);}
+    if (width && (width<500)) return primary;
+    return primary+'<br>'+secondary;
+}
+
 export class PlotlyDataLayoutConfig {
   constructor(options){
     this.data = options.data || [];
@@ -70,6 +79,26 @@ function extractNestedConfig(sim, starter){
 
 export class Visualization extends PlotlyDataLayoutConfig {
   show(div){
+    try {
+      const lines = this.layout.title.text.split('<br>');
+      const width = window.screen.availWidth || window.screen.width;
+      const charw = Math.floor(width/15); // 15 pixels per char is a guess
+      const newlines = [];
+      lines.forEach((line)=>{
+        const words = line.split(' ');
+        while(words.length){
+          let lineLimit = charw;
+          let reformattedLine = '';
+          do {
+            const word = words.unshift();
+            reformattedLine += word+' ';
+            lineLimit -= word.length+1;
+          } while(lineLimit>0);
+          newlines.push(reformattedLine);
+        }
+      });
+      this.layout.title.text = newlines.join('<br>');
+    } catch(e){ console.log(e);}
     Plotly.react(div,this.data,this.layout,this.config);
     return this;
   }
@@ -685,7 +714,7 @@ export const helpers = {
         const data = profitHeader.map((name,j)=>(
           {
             y: column['y'+(j+1)],
-            name: name+'<br>'+sim.pool.agents[j].constructor.name.replace('Agent','').substr(0,5),
+            name: tickText(name,sim.pool.agents[j].constructor.name.replace('Agent','').substr(0,5)),
             type: 'violin',
             meanline: {
               visible: true

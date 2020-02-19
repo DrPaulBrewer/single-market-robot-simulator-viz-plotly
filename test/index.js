@@ -1,5 +1,4 @@
 /* eslint-env node, mocha */
-
 /* eslint no-console: "off", newline-per-chained-call: "off" */
 
 import '@babel/polyfill';
@@ -16,6 +15,8 @@ const { Simulation } = singleMarketRobotSimulator;
 
 let sim1,sim2,sim3;
 let visuals;
+
+global.window = {screen: { width: 400 }}; // eslint-disable-line no-global-assign
 
 describe('run Example simulations', function(){
   it('should run and finish sim1', function(){

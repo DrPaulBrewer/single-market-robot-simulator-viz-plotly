@@ -38,6 +38,19 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 /* eslint consistent-this: ["error", "app", "that"] */
 
 /* eslint no-console: "off" */
+function tickText(primary, secondary) {
+  let width;
+
+  try {
+    width = +window.screen.availWidth || +window.screen.width;
+  } catch (e) {
+    console.log(e);
+  }
+
+  if (width && width < 500) return primary;
+  return primary + '<br>' + secondary;
+}
+
 class PlotlyDataLayoutConfig {
   constructor(options) {
     this.data = options.data || [];
@@ -106,6 +119,33 @@ function extractNestedConfig(sim, starter) {
 
 class Visualization extends PlotlyDataLayoutConfig {
   show(div) {
+    try {
+      const lines = this.layout.title.text.split('<br>');
+      const width = window.screen.availWidth || window.screen.width;
+      const charw = Math.floor(width / 15); // 15 pixels per char is a guess
+
+      const newlines = [];
+      lines.forEach(line => {
+        const words = line.split(' ');
+
+        while (words.length) {
+          let lineLimit = charw;
+          let reformattedLine = '';
+
+          do {
+            const word = words.unshift();
+            reformattedLine += word + ' ';
+            lineLimit -= word.length + 1;
+          } while (lineLimit > 0);
+
+          newlines.push(reformattedLine);
+        }
+      });
+      this.layout.title.text = newlines.join('<br>');
+    } catch (e) {
+      console.log(e);
+    }
+
     Plotly.react(div, this.data, this.layout, this.config);
     return this;
   }
@@ -811,7 +851,7 @@ const helpers = {
       const agentColors = sim.pool.agents.map(a => a.color || 'darkviolet');
       const data = profitHeader.map((name, j) => ({
         y: column['y' + (j + 1)],
-        name: name + '<br>' + sim.pool.agents[j].constructor.name.replace('Agent', '').substr(0, 5),
+        name: tickText(name, sim.pool.agents[j].constructor.name.replace('Agent', '').substr(0, 5)),
         type: 'violin',
         meanline: {
           visible: true
