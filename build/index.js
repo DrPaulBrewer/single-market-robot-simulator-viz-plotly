@@ -133,10 +133,10 @@ class Visualization extends PlotlyDataLayoutConfig {
           let reformattedLine = '';
 
           do {
-            const word = words.unshift();
+            const word = words.shift();
             reformattedLine += word + ' ';
             lineLimit -= word.length + 1;
-          } while (lineLimit > 0);
+          } while (words.length > 0 && lineLimit > 0);
 
           newlines.push(reformattedLine);
         }
