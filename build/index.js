@@ -464,7 +464,7 @@ function plotFactory(chart) {
 
       if (text) {
         trace.hovertext = text;
-        trace.hoverinfo = 'text+name+y';
+        trace.hoverinfo = 'text+name+y+x';
       }
 
       return trace;

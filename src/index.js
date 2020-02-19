@@ -336,7 +336,7 @@ export function plotFactory(chart) {
       const trace = { name, mode, type, x, y, marker};
       if (text){
         trace.hovertext = text;
-        trace.hoverinfo ='text+name+y';
+        trace.hoverinfo ='text+name+y+x';
       }
       return trace;
     });
