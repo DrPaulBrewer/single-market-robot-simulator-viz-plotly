@@ -19,8 +19,25 @@ function tickText(primary,secondary){
     return primary+'<br>'+secondary;
 }
 
+function numberedStringArray(s,n){
+  return (
+    new Array(n)
+    .fill(0)
+    .map((z,j)=>(s+(+1+j)))
+  );
+}
+
 function getAgentColors(sim){
   return sim.pool.agents.map((a)=>(a.color || 'darkviolet'));
+}
+
+function getAgentText(sim){
+  const toBSID = [].concat(
+    numberedStringArray('B',sim.config.numberOfBuyers),
+    numberedStringArray('S',sim.config.numberOfSellers)
+  );
+  const toClass = sim.pool.agents.map((a)=>(a.constructor.name.replace('Agent','')));
+  return toBSID.map((id,j)=>(id+' '+toClass[j]));
 }
 
 export class PlotlyDataLayoutConfig {
@@ -274,14 +291,17 @@ export function plotFactory(chart) {
   /* chart properties are title, log or logs, names, xs, ys, modes, symbols, agentcolors, layout */
 
   return function (sim) {
-    let series = null;
-    const agentColorArray = getAgentColors(sim);
+    let series=null, agentColorArray=null, agentTextArray=null;
+    if (Array.isArray(chart.agentcolors)){
+      agentColorArray = getAgentColors(sim);
+      agentTextArray = getAgentText(sim);
+    }
     if (chart.log)
       series = transpluck(extract(sim.logs[chart.log]), { pluck: [].concat(chart.xs, chart.ys) });
     const traces = chart.names.map(function (name, i) {
       const type = 'scatter';
       const mode = chart.modes[i % chart.modes.length];
-      let x = [], y=[], marker = { size: 10 }, color;
+      let x = [], y=[], marker = { size: 10 }, color, text;
       try {
         const xvar = chart.xs[i % chart.xs.length];
         const yvar = chart.ys[i % chart.ys.length];
@@ -295,7 +315,12 @@ export function plotFactory(chart) {
         x = series[xvar];
         y = series[yvar];
         // agent ids begin with 1 in single-market-robot-simulator but agent with id 1 is at sim.pool.agents[0]
-        color = agentcolorvar && Array.isArray(series[agentcolorvar]) && (series[agentcolorvar].map((id)=>(agentColorArray[id-1])));
+        if (agentcolorvar && Array.isArray(series[agentcolorvar])) {
+          color = series[agentcolorvar].map((id)=>(agentColorArray[id-1]));
+          text  = series[agentcolorvar].map((id)=>(agentTextArray[id-1]));
+          marker.color = color;
+          marker.text = text;
+        }
         if (!Array.isArray(x))
           x = [];
         if (!Array.isArray(y))
@@ -307,10 +332,13 @@ export function plotFactory(chart) {
         console.log(e);
         x = [];
         y = [];
-        color = null;
       }
-      if (Array.isArray(color)) marker.color = color;
-      return { name, mode, type, x, y, marker };
+      const trace = { name, mode, type, x, y, marker};
+      if (text){
+        trace.hovertext = text;
+        trace.hoverinfo ='text+name+y';
+      }
+      return trace;
     });
     const layout = getLayout({xs: chart.xs,ys: chart.ys, title: chart.title, sim});
     return [traces, layout];
@@ -323,13 +351,6 @@ export function competitiveEquilibriumModel({demand,supply}){
   return ceModel;
 }
 
-function numberedStringArray(s,n){
-  return (
-    new Array(n)
-    .fill(0)
-    .map((z,j)=>(s+(+1+j)))
-  );
-}
 
 /* this exports all the functions below, and also assigns them to the helpers object.
  * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
