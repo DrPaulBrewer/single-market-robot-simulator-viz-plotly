@@ -294,7 +294,8 @@ export function plotFactory(chart) {
         }
         x = series[xvar];
         y = series[yvar];
-        color = agentcolorvar && Array.isArray(series[agentcolorvar]) && (series[agentcolorvar].map((id)=>(agentColorArray[id])));
+        // agent ids begin with 1 in single-market-robot-simulator but agent with id 1 is at sim.pool.agents[0]
+        color = agentcolorvar && Array.isArray(series[agentcolorvar]) && (series[agentcolorvar].map((id)=>(agentColorArray[id-1])));
         if (!Array.isArray(x))
           x = [];
         if (!Array.isArray(y))
