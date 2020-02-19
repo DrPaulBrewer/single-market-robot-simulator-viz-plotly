@@ -128,7 +128,7 @@ class Visualization extends PlotlyDataLayoutConfig {
       lines.forEach(line => {
         const words = line.split(' ');
 
-        while (words.length) {
+        while (words.length > 0) {
           let lineLimit = charw;
           let reformattedLine = '';
 
@@ -136,7 +136,7 @@ class Visualization extends PlotlyDataLayoutConfig {
             const word = words.shift();
             reformattedLine += word + ' ';
             lineLimit -= word.length + 1;
-          } while (words.length > 0 && lineLimit > 0);
+          } while (words.length > 0 && lineLimit >= words[0].length);
 
           newlines.push(reformattedLine);
         }
