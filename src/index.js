@@ -281,7 +281,7 @@ export function plotFactory(chart) {
     const traces = chart.names.map(function (name, i) {
       const type = 'scatter';
       const mode = chart.modes[i % chart.modes.length];
-      let x = [], y=[], marker = {}, color;
+      let x = [], y=[], marker = { size: 10 }, color;
       try {
         const xvar = chart.xs[i % chart.xs.length];
         const yvar = chart.ys[i % chart.ys.length];

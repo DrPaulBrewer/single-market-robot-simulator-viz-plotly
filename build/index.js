@@ -396,7 +396,9 @@ function plotFactory(chart) {
       const mode = chart.modes[i % chart.modes.length];
       let x = [],
           y = [],
-          marker = {},
+          marker = {
+        size: 10
+      },
           color;
 
       try {
