@@ -46,7 +46,7 @@
     "mocha": "^7.0.1",
     "nyc": "^15.0.0",
     "should": "^13.2.3",
-    "single-market-robot-simulator": "^5.14.0"
+    "single-market-robot-simulator": "^6.0.0"
   },
   "jsnext:main": "src/index.js"
 }
