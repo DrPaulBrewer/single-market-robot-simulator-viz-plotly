@@ -496,8 +496,7 @@ export const helpers = {
       });
       const layout = getLayout({
         title: chart.title,
-        ys: [chart.y],
-        xs: 'caseId'
+        ys: [chart.y]
       });
       return [data, layout];
     };
@@ -532,8 +531,7 @@ export const helpers = {
       });
       const layout = getLayout({
         title: chart.title,
-        ys: [chart.y],
-        xs: 'caseId'
+        ys: [chart.y]
       });
       return [data, layout];
     };
@@ -595,7 +593,6 @@ export const helpers = {
       return [traces, layout];
     };
   },
-
 
   histogram2DFactory(chart) {
 

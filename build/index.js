@@ -654,8 +654,7 @@ const helpers = {
       });
       const layout = getLayout({
         title: chart.title,
-        ys: [chart.y],
-        xs: 'caseId'
+        ys: [chart.y]
       });
       return [data, layout];
     };
@@ -692,8 +691,7 @@ const helpers = {
       });
       const layout = getLayout({
         title: chart.title,
-        ys: [chart.y],
-        xs: 'caseId'
+        ys: [chart.y]
       });
       return [data, layout];
     };
