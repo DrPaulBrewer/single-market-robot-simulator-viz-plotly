@@ -35,6 +35,11 @@
     "y": "gini"
   },
   {
+    "f": "smartPlotAgentProfits",
+    "title": "[s] Compare Profit performance of 4 Agents",
+    "input": "study"
+  },
+  {
     "f": "boxplotFactory",
     "title": "[b] Compare Trade price distributions",
     "input": "study",

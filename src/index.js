@@ -9,6 +9,12 @@ import deepmerge from 'deepmerge';
 import decamelize from 'decamelize';
 import * as Random from 'random-js';
 import * as marketPricing from 'market-pricing';
+import MaxMinDist from 'max-min-dist';
+
+function toNumberOrZero(x){
+  const n = +x;
+  return (Number.isNaN(n))? 0: n;
+}
 
 function tickText(primary,secondary){
     let width;
@@ -774,7 +780,71 @@ export const helpers = {
       );
       return [traces, layout];
     };
+  },
+
+  smartPlotAgentProfits(chart){
+    const numberOfPlots = +(chart.numberOfPlots) || 4;
+    return function(sims){
+      if (!Array.isArray(sims))
+        throw new Error("smartPlotAgentProfitsVsCaseId requires an array of multiple simulations");
+      const cases = new Array(sims.length)
+        .fill(0)
+        .map((v,i)=>(i)); // 0, 1, 2, ..., sims.length-1
+      // here we've assumed all simulations have the same number of buyers and sellers
+      // ideally we should _verify_ first
+      const { numberOfBuyers, numberOfSellers } = sims[0].config;
+      const profitHeader = [].concat(
+        numberedStringArray('B',numberOfBuyers),
+        numberedStringArray('S',numberOfSellers)
+      );
+      // agents can have different roles in different sims
+      // const agentColors = getAgentColors(sims[0]);
+      //    name: tickText(name,sim.pool.agents[j].constructor.name.replace('Agent','').substr(0,5))
+      const agentProfitVectors = profitHeader.map((agentName,j)=>{
+        // agent index is j
+        const vector =
+          sims
+          .map((sim)=>{
+            const col = sim.logs.profit.data[0].indexOf('y'+(j+1)); // y columns begin with y1
+            if (col<0) throw new Error("smartPlotAgentProfits: could not find column for profit data");
+            const periods = sim.logs.profit.data.length-1; // -1 because header is not a period
+            let sum = 0;
+            sim.logs.profit.data.forEach((row,k)=>{ if(k>1) sum += toNumberOrZero(row[col]); });
+            return sum/periods;
+          });
+        return vector;
+      });
+      const chartOptimizer = new MaxMinDist({
+        data: agentProfitVectors
+      });
+      const agentIndexesForChart = chartOptimizer.bestGuess(numberOfPlots).result;
+      const traces = agentIndexesForChart.map(
+        (agentIndex)=>(
+          {
+            x: cases,
+            y: agentProfitVectors[agentIndex],
+            name: profitHeader[agentIndex],
+            mode: 'lines+markers',
+            marker: {
+              symbol: ((agentIndex < numberOfBuyers) ? "circle" : "square")
+            },
+            type: 'scatter'
+          }
+        )
+      );
+      const layout = deepmerge(
+        getLayout({
+          title: chart.title || "Average Profit comparison",
+          xs:'caseId',
+          ys:'profit'
+        }),
+        chart.layout || {}
+      );
+      return [traces, layout];
+    };
+
   }
+
 };
 
 export function build(arrayOfVisuals) {
