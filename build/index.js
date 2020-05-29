@@ -27,6 +27,8 @@ var Random = _interopRequireWildcard(require("random-js"));
 
 var marketPricing = _interopRequireWildcard(require("market-pricing"));
 
+var _maxMinDist = _interopRequireDefault(require("max-min-dist"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
@@ -38,6 +40,11 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 /* eslint consistent-this: ["error", "app", "that"] */
 
 /* eslint no-console: "off" */
+function toNumberOrZero(x) {
+  const n = +x;
+  return Number.isNaN(n) ? 0 : n;
+}
+
 function tickText(primary, secondary) {
   let width;
 
@@ -82,8 +89,7 @@ class PlotlyDataLayoutConfig {
    */
 
 
-  setInteractivity() {
-    let isInteractive = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  setInteractivity(isInteractive = false) {
     const config = this.config;
     config.staticPlot = !isInteractive;
     config.displayModeBar = isInteractive;
@@ -332,25 +338,23 @@ function axisRange(vs, sim) {
   }
 }
 
-function annotation(_ref) {
-  let {
-    caseid,
-    tag
-  } = _ref;
+function annotation({
+  caseid,
+  tag
+}) {
   const a1 = caseid === undefined ? '' : "case:".concat(caseid, " ");
   const a2 = tag === undefined ? '' : tag;
   return a1 || a2 ? '<br>' + a1 + a2 : '';
 }
 
-function getLayout(_ref2) {
-  let {
-    xs,
-    ys,
-    title,
-    sim,
-    xrange,
-    yrange
-  } = _ref2;
+function getLayout({
+  xs,
+  ys,
+  title,
+  sim,
+  xrange,
+  yrange
+}) {
   const items = [defaultLayout];
 
   function xaxis(obj) {
@@ -479,11 +483,10 @@ function plotFactory(chart) {
   };
 }
 
-function competitiveEquilibriumModel(_ref3) {
-  let {
-    demand,
-    supply
-  } = _ref3;
+function competitiveEquilibriumModel({
+  demand,
+  supply
+}) {
   const ceModel = marketPricing.crossSingleUnitDemandAndSupply(demand, supply);
   ceModel.summary = ceModel && ceModel.p && ceModel.q ? 'CE: ' + JSON.stringify(ceModel) : '';
   return ceModel;
@@ -912,6 +915,61 @@ const helpers = {
         xs: 'period',
         ys: 'profit',
         sim
+      }), chart.layout || {});
+      return [traces, layout];
+    };
+  },
+
+  smartPlotAgentProfits(chart) {
+    const numberOfPlots = +chart.numberOfPlots || 4;
+    return function (sims) {
+      if (!Array.isArray(sims)) throw new Error("smartPlotAgentProfitsVsCaseId requires an array of multiple simulations");
+      const cases = new Array(sims.length).fill(0).map((v, i) => i); // 0, 1, 2, ..., sims.length-1
+      // here we've assumed all simulations have the same number of buyers and sellers
+      // ideally we should _verify_ first
+
+      const {
+        numberOfBuyers,
+        numberOfSellers
+      } = sims[0].config;
+      const profitHeader = [].concat(numberedStringArray('B', numberOfBuyers), numberedStringArray('S', numberOfSellers)); // agents can have different roles in different sims
+      // const agentColors = getAgentColors(sims[0]);
+      //    name: tickText(name,sim.pool.agents[j].constructor.name.replace('Agent','').substr(0,5))
+
+      const agentProfitVectors = profitHeader.map((agentName, j) => {
+        // agent index is j
+        const vector = sims.map(sim => {
+          const col = sim.logs.profit.data[0].indexOf('y' + (j + 1)); // y columns begin with y1
+
+          if (col < 0) throw new Error("smartPlotAgentProfits: could not find column for profit data");
+          const periods = sim.logs.profit.data.length - 1; // -1 because header is not a period
+
+          let sum = 0;
+          sim.logs.profit.data.forEach((row, k) => {
+            if (k > 1) sum += toNumberOrZero(row[col]);
+          });
+          return sum / periods;
+        });
+        return vector;
+      });
+      const chartOptimizer = new _maxMinDist.default({
+        data: agentProfitVectors
+      });
+      const agentIndexesForChart = chartOptimizer.bestGuess(numberOfPlots).result;
+      const traces = agentIndexesForChart.map(agentIndex => ({
+        x: cases,
+        y: agentProfitVectors[agentIndex],
+        name: profitHeader[agentIndex],
+        mode: 'lines+markers',
+        marker: {
+          symbol: agentIndex < numberOfBuyers ? "circle" : "square"
+        },
+        type: 'scatter'
+      }));
+      const layout = (0, _deepmerge.default)(getLayout({
+        title: chart.title || "Average Profit comparison",
+        xs: 'caseId',
+        ys: 'profit'
       }), chart.layout || {});
       return [traces, layout];
     };
