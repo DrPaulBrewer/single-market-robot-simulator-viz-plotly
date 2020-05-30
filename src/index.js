@@ -803,11 +803,12 @@ export const helpers = {
         const vector =
           sims
           .map((sim)=>{
-            const col = sim.logs.profit.data[0].indexOf('y'+(j+1)); // y columns begin with y1
+            const profitData = extract(sim.logs.profit);
+            const col = profitData[0].indexOf('y'+(j+1)); // y columns begin with y1
             if (col<0) throw new Error("smartPlotAgentProfits: could not find column for profit data");
-            const periods = sim.logs.profit.data.length-1; // -1 because header is not a period
+            const periods = profitData.length-1; // -1 because header is not a period
             let sum = 0;
-            sim.logs.profit.data.forEach((row,k)=>{ if(k>1) sum += toNumberOrZero(row[col]); });
+            profitData.forEach((row,k)=>{ if(k>1) sum += toNumberOrZero(row[col]); });
             return sum/periods;
           });
         return vector;
