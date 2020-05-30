@@ -787,9 +787,7 @@ export const helpers = {
     return function(sims){
       if (!Array.isArray(sims))
         throw new Error("smartPlotAgentProfitsVsCaseId requires an array of multiple simulations");
-      const cases = new Array(sims.length)
-        .fill(0)
-        .map((v,i)=>(i)); // 0, 1, 2, ..., sims.length-1
+      const cases = sims.map((sim,j)=>(sim.tag || j));
       // here we've assumed all simulations have the same number of buyers and sellers
       // ideally we should _verify_ first
       const { numberOfBuyers, numberOfSellers } = sims[0].config;
@@ -817,13 +815,26 @@ export const helpers = {
       const chartOptimizer = new MaxMinDist({
         data: agentProfitVectors
       });
-      const agentIndexesForChart = chartOptimizer.bestGuess(numberOfPlots).result;
+      let agentIndexesForChart, chartNames;
+      if (numberOfPlots <= agentProfitVectors.length){
+        agentIndexesForChart = agentProfitVectors.map((v,j)=>(j));
+        chartNames = agentIndexesForChart.map((id)=>(profitHeader[id]));
+      } else {
+        agentIndexesForChart = chartOptimizer.bestGuess(numberOfPlots).result;
+        const similar = chartOptimizer.group(agentIndexesForChart);
+        chartNames = similar.map((g)=>{
+          const agentNames = g.map((id)=>(profitHeader[id]));
+          if (g.length===1) return agentNames[0];
+          if (g.length<5) return agentNames.join(",");
+          return agentNames.slice(0,4).join(",")+`+${agentNames.length-5} more`;
+        });
+      }
       const traces = agentIndexesForChart.map(
-        (agentIndex)=>(
+        (agentIndex, k)=>(
           {
             x: cases,
             y: agentProfitVectors[agentIndex],
-            name: profitHeader[agentIndex],
+            name: chartNames[k],
             mode: 'lines+markers',
             marker: {
               symbol: ((agentIndex < numberOfBuyers) ? "circle" : "square")
