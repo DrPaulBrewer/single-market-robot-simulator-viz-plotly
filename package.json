@@ -32,22 +32,22 @@
     "decamelize": "^4.0.0",
     "deepmerge": "^4.2.2",
     "market-pricing": "^1.5.0",
-    "max-min-dist": "^0.3.0",
+    "max-min-dist": "^0.5.0",
     "random-js": "^2.1.0",
     "transpluck": "^1.0.4"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.8.4",
-    "@babel/polyfill": "^7.8.3",
-    "@babel/preset-env": "^7.8.4",
-    "@babel/register": "^7.8.3",
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.1",
+    "@babel/polyfill": "^7.10.1",
+    "@babel/preset-env": "^7.10.1",
+    "@babel/register": "^7.10.1",
     "esdoc": "^1.1.0",
-    "eslint": "^6.8.0",
+    "eslint": "^7.1.0",
     "mocha": "^7.2.0",
-    "nyc": "^15.0.0",
+    "nyc": "^15.0.1",
     "should": "^13.2.3",
-    "single-market-robot-simulator": "^6.0.0"
+    "single-market-robot-simulator": "^6.0.5"
   },
   "jsnext:main": "src/index.js"
 }

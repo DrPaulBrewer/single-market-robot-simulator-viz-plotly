@@ -951,15 +951,15 @@ const helpers = {
         });
         return vector;
       });
-      const chartOptimizer = new _maxMinDist.default({
-        data: agentProfitVectors
-      });
       let agentIndexesForChart, chartNames;
 
-      if (numberOfPlots <= agentProfitVectors.length) {
+      if (numberOfPlots >= agentProfitVectors.length) {
         agentIndexesForChart = agentProfitVectors.map((v, j) => j);
         chartNames = agentIndexesForChart.map(id => profitHeader[id]);
       } else {
+        const chartOptimizer = new _maxMinDist.default({
+          data: agentProfitVectors
+        });
         agentIndexesForChart = chartOptimizer.bestGuess(numberOfPlots).result;
         const similar = chartOptimizer.group(agentIndexesForChart);
         chartNames = similar.map(g => {
