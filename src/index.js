@@ -827,7 +827,7 @@ export const helpers = {
           const agentNames = g.map((id)=>(profitHeader[id]));
           if (g.length===1) return agentNames[0];
           if (g.length<5) return agentNames.join(",");
-          return agentNames.slice(0,4).join(",")+`+${agentNames.length-5} more`;
+          return agentNames.slice(0,4).join(",")+`+${agentNames.length-4} more`;
         });
       }
       const traces = agentIndexesForChart.map(
