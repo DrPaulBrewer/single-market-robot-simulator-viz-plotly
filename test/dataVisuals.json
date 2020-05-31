@@ -14,6 +14,18 @@
     "y": "closePrice"
   },
   {
+    "f": "smartPlotAgentProfits",
+    "title": "[s] Compare Average Profit: All Agents",
+    "input": "study",
+    "numberOfPlots": 10000
+  },
+  {
+    "f": "smartPlotAgentProfits",
+    "title": "[s] Compare Average Profit: 4 group max-min-d classifier",
+    "input": "study",
+    "numberOfPlots": 4
+  },
+  {
     "f": "violinFactory",
     "title": "[v] Compare Efficiency of Allocation",
     "input": "study",
@@ -33,11 +45,6 @@
     "input": "study",
     "log": "ohlc",
     "y": "gini"
-  },
-  {
-    "f": "smartPlotAgentProfits",
-    "title": "[s] Compare Profit performance of 4 Agents",
-    "input": "study"
   },
   {
     "f": "boxplotFactory",
