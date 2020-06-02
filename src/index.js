@@ -794,7 +794,7 @@ export const helpers = {
     return function(sims){
       if (!Array.isArray(sims))
         throw new Error("smartPlotAgentProfitsVsCaseId requires an array of multiple simulations");
-      const cases = sims.map((sim,j)=>(sim.tag || j));
+      const cases = sims.map((sim, j)=>(''+(sim.config.tag || sim.config.caseid || j)));
       // here we've assumed all simulations have the same number of buyers and sellers
       // ideally we should _verify_ first
       const { numberOfBuyers, numberOfSellers } = sims[0].config;
