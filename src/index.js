@@ -549,7 +549,7 @@ export const helpers = {
     /* req chart properties are title, names, logs, vars */
     /* opt chart properties are bins, range */
 
-    const nbinsxDefault = 100;
+    const width = window.screen.availWidth || window.screen.width || 300;
 
     return function (sim) {
       let traces = chart.names.map(function (name, i) {
@@ -567,8 +567,7 @@ export const helpers = {
           name,
           x,
           type: 'histogram',
-          opacity: 0.40,
-          nbinsx: nbinsxDefault
+          opacity: 0.40
         };
       });
       const layout = Object.assign(
@@ -576,7 +575,7 @@ export const helpers = {
         getLayout({sim, xrange: chart.range, xs: chart.vars, ys: 'N', title: chart.title}),
         {barmode: 'overlay'}
       );
-      let mymin, mymax, mybins;
+      let mymin, mymax;
       if (layout && layout.xaxis && (layout.xaxis.range)){
           [mymin, mymax] = layout.xaxis.range;
       }
@@ -589,13 +588,21 @@ export const helpers = {
         });
         layout.xaxis.range = [mymin,mymax];
       }
-      if (chart.bins) {
-        mybins = chart.bins;
+      let binsize = 1;
+      if (chart.bins){
+        binsize = (mymax-mymin)/chart.bins;
       } else {
-        mybins = Math.max(0, Math.min(200, Math.floor(1 + mymax - mymin)));
+        while(Math.ceil((mymax-mymin)/binsize)>(width/3)){
+          binsize += 1;
+        }
       }
-      if (mybins && (mybins>=2) && (mybins !== nbinsxDefault))
-        traces.forEach(function (trace) { trace.nbinsx = mybins; });
+      traces.forEach(function (trace) {
+        trace.xbins = {
+          start: mymin,
+          end: mymax,
+          size: binsize
+        };
+      });
       return [traces, layout];
     };
   },
