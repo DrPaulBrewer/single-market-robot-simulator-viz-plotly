@@ -147,6 +147,7 @@ export class VisualizationFactory  {
 
   load(options){
     const { from, to, title, isInteractive } = options;
+    console.log('smrs-viz-plotly:load options=',options);
     if (!from) throw new Error("no data source for VisualizationFactory.load");
     if (!Array.isArray(from) && (this.meta.input==='study')){
       throw new Error("this visualization requires an array of simulations");
