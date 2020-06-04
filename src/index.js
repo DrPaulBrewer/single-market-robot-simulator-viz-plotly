@@ -815,7 +815,7 @@ export const helpers = {
             if (col<0) throw new Error("smartPlotAgentProfits: could not find column for profit data");
             const periods = profitData.length-1; // -1 because header is not a period
             let sum = 0;
-            profitData.forEach((row,k)=>{ if(k>1) sum += toNumberOrZero(row[col]); });
+            profitData.forEach((row,k)=>{ if(k>0) sum += toNumberOrZero(row[col]); });
             return sum/periods;
           });
         return vector;
