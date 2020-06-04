@@ -3,8 +3,8 @@
   "sellerCosts": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
   "L": 1,
   "H": 200,
-  "numberOfBuyers": 10,
-  "numberOfSellers": 10,
+  "numberOfBuyers": 5,
+  "numberOfSellers": 5,
   "buyerAgentType": ["ZIAgent"],
   "sellerAgentType": ["ZIAgent"],
   "periods": 20,
@@ -16,7 +16,9 @@
   "ignoreBudgetConstraint": false,
   "xMarket": {
     "buySellBookLimit": 0,
-    "resetAfterEachTrade": true
+    "resetAfterEachTrade": true,
+    "buyImprove": 2,
+    "sellImprove": 2
   },
   "silent": true
 }

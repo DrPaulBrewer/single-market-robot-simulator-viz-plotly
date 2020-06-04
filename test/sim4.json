@@ -65,8 +65,8 @@
     "buyImprove": 2,
     "sellImprove": 2
   },
-  "caseid": 0,
-  "periods": 100,
+  "caseid": 4,
+  "periods": 1,
   "L": 1,
   "H": 1000,
   "periodDuration": 1000,
