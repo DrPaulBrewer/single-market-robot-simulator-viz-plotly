@@ -164,9 +164,14 @@ class Visualization extends PlotlyDataLayoutConfig {
       this.layout.title.text = newlines.join('<br>');
     } catch (e) {
       console.log(e);
-    }
+    } // Plotly.react restyles the existing div; Plotly.newPlot overwrites completely
+    // 2020-Jun-05 PJB This code previously used Plot.react(div, this.data, this.layout, this.config);
+    // see https://plotly.com/javascript/plotlyjs-function-reference/
+    // choose only ONE
 
-    Plotly.react(div, this.data, this.layout, this.config);
+
+    Plotly.newPlot(div, this.data, this.layout, this.config); // Plotly.react(div,this.data,this.layout,this.config);
+
     return this;
   }
 
