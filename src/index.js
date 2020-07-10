@@ -16,6 +16,25 @@ function toNumberOrZero(x){
   return (Number.isNaN(n))? 0: n;
 }
 
+function isContiguousFiniteNumberArray(a){
+  if (!Array.isArray(a)) return false;
+  let i=0,l=a.length;
+  for(i=0;i<l;++i){
+    const n = a[i];
+    if (
+      (typeof(n)!=='number') ||
+      (!isFinite(n))
+    )
+      return false;
+  }
+  return true;
+}
+
+function assertContiguousFiniteNumberArray(a){
+  if (!isContiguousFiniteNumberArray(a))
+    throw new Error("requires contiguous, finite, numeric data array --- found gaps or bad data");
+}
+
 function tickText(primary,secondary){
     let width;
     try {
@@ -336,10 +355,10 @@ export function plotFactory(chart) {
           marker.color = color;
           marker.text = text;
         }
-        if (!Array.isArray(x))
-          x = [];
-        if (!Array.isArray(y))
-          y = [];
+        if (typeof(x[0])==='number')
+          assertContiguousFiniteNumberArray(x);
+        if (typeof(y[0])==='number')
+          assertContiguousFiniteNumberArray(y);
         if (x.length!==y.length)
           throw new Error("plotFactory: x and y series are of unequal length");
       } catch(e){
@@ -495,6 +514,7 @@ export const helpers = {
         let y = [];
         try {
           y = transpluck(extract(sim.logs[chart.log]), { pluck: [chart.y] })[chart.y];
+          assertContiguousFiniteNumberArray(y);
         } catch(e){
           y = [];
           console.log("boxplotFactory: error, no data for simulation "+j);
@@ -527,6 +547,7 @@ export const helpers = {
         let y = [];
         try {
           y = transpluck(extract(sim.logs[chart.log]), { pluck: [chart.y] })[chart.y];
+          assertContiguousFiniteNumberArray(y);
         } catch(e){
           y = [];
           console.log("violinFactory: error, no data for simulation "+j);
@@ -567,6 +588,7 @@ export const helpers = {
         let x = [];
         try {
           x = transpluck(extract(sim.logs[mylog]), { pluck: [mylet] })[mylet];
+          assertContiguousFiniteNumberArray(x);
         } catch(e){
           x = [];
           console.log("histogramFactory: error, no data for "+name+" chart "+i);
@@ -633,7 +655,9 @@ export const helpers = {
         series = chart.names.map(function (name, i) {
           let mylog = chart.logs[i % chart.logs.length];
           let mylet = chart.vars[i % chart.vars.length];
-          return transpluck(extract(sim.logs[mylog]), { pluck: [mylet] })[mylet];
+          const data = transpluck(extract(sim.logs[mylog]), { pluck: [mylet] })[mylet];
+          assertContiguousFiniteNumberArray(data);
+          return data;
         });
       } catch(e){
         console.log("histogram2DFactory: error, no data");
