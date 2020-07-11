@@ -216,7 +216,8 @@ class VisualizationFactory {
       from,
       to,
       title,
-      isInteractive
+      isInteractive,
+      axis
     } = options;
     if (!from) throw new Error("no data source for VisualizationFactory.load");
 
@@ -241,7 +242,7 @@ class VisualizationFactory {
     // from triplet array format to object property format
 
 
-    const [data, _layout, _config] = this.loader(from);
+    const [data, _layout, _config] = this.loader(from, axis);
     const layout = (0, _deepmerge.default)(this.layout, _layout || {});
     const config = (0, _deepmerge.default)(this.config, _config || {});
     const v = new Visualization({
@@ -375,7 +376,8 @@ function getLayout({
   title,
   sim,
   xrange,
-  yrange
+  yrange,
+  axis
 }) {
   const items = [defaultLayout];
 
@@ -402,7 +404,9 @@ function getLayout({
     }
   });
 
-  if (xs) {
+  if (axis) {
+    xaxis(axisTitle(axis.key));
+  } else if (xs) {
     xaxis(axisTitle(xs));
     xaxis(xrange ? {
       range: xrange
@@ -512,6 +516,15 @@ function competitiveEquilibriumModel({
   const ceModel = marketPricing.crossSingleUnitDemandAndSupply(demand, supply);
   ceModel.summary = ceModel && ceModel.p && ceModel.q ? 'CE: ' + JSON.stringify(ceModel) : '';
   return ceModel;
+}
+/**
+ * simName(sim, axis) finds a name for a sim in a study-level chart
+ */
+
+
+function simName(sim, axis, j) {
+  const name = '' + (axis && axis.values && axis.values[j] || sim.config.tag || sim.config.caseid || j);
+  return name;
 }
 /* this exports all the functions below, and also assigns them to the helpers object.
  * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
@@ -653,7 +666,7 @@ const helpers = {
 
   boxplotFactory(chart) {
     // requires log, y, input='study'
-    return function (sims) {
+    return function (sims, axis) {
       if (!Array.isArray(sims)) throw new Error("boxplot requires an array of multiple simulations");
       const data = sims.map((sim, j) => {
         let y = [];
@@ -669,7 +682,7 @@ const helpers = {
           console.log(e);
         }
 
-        const name = '' + (sim.config.tag || sim.config.caseid);
+        const name = simName(sim, axis, j);
         return {
           y,
           name,
@@ -680,7 +693,8 @@ const helpers = {
       });
       const layout = getLayout({
         title: chart.title,
-        ys: [chart.y]
+        ys: [chart.y],
+        axis
       });
       return [data, layout];
     };
@@ -688,7 +702,7 @@ const helpers = {
 
   violinFactory(chart) {
     // requires log, y, input='study'
-    return function (sims) {
+    return function (sims, axis) {
       if (!Array.isArray(sims)) throw new Error("violin requires an array of multiple simulations");
       const data = sims.map((sim, j) => {
         let y = [];
@@ -704,7 +718,7 @@ const helpers = {
           console.log(e);
         }
 
-        const name = '' + (sim.config.tag || sim.config.caseid);
+        const name = simName(sim, axis, j);
         return {
           y,
           name,
@@ -718,7 +732,8 @@ const helpers = {
       });
       const layout = getLayout({
         title: chart.title,
-        ys: [chart.y]
+        ys: [chart.y],
+        axis
       });
       return [data, layout];
     };
@@ -956,9 +971,9 @@ const helpers = {
 
   smartPlotAgentProfits(chart) {
     const numberOfPlots = +chart.numberOfPlots || 4;
-    return function (sims) {
+    return function (sims, axis) {
       if (!Array.isArray(sims)) throw new Error("smartPlotAgentProfitsVsCaseId requires an array of multiple simulations");
-      const cases = sims.map((sim, j) => '' + (sim.config.tag || sim.config.caseid || j)); // here we've assumed all simulations have the same number of buyers and sellers
+      const cases = sims.map((sim, j) => simName(sim, axis, j)); // here we've assumed all simulations have the same number of buyers and sellers
       // ideally we should _verify_ first
 
       const {
@@ -1017,8 +1032,8 @@ const helpers = {
       }));
       const layout = (0, _deepmerge.default)(getLayout({
         title: chart.title || "Average Profit comparison",
-        xs: 'caseId',
-        ys: 'profit'
+        ys: 'profit',
+        axis
       }), chart.layout || {});
       return [traces, layout];
     };

@@ -174,7 +174,7 @@ export class VisualizationFactory  {
   }
 
   load(options){
-    const { from, to, title, isInteractive } = options;
+    const { from, to, title, isInteractive, axis } = options;
     if (!from) throw new Error("no data source for VisualizationFactory.load");
     if (!Array.isArray(from) && (this.meta.input==='study')){
       throw new Error("this visualization requires an array of simulations");
@@ -195,7 +195,7 @@ export class VisualizationFactory  {
     }
     // the loaders were written first; adapt their output
     // from triplet array format to object property format
-    const [data,_layout,_config] = this.loader(from);
+    const [data,_layout,_config] = this.loader(from, axis);
     const layout = deepmerge(this.layout,_layout || {});
     const config = deepmerge(this.config,_config || {});
     const v =  new Visualization({ data, layout, config});
@@ -302,14 +302,16 @@ function annotation({caseid, tag}){
   return (a1 || a2)? ('<br>'+a1+a2) : '';
 }
 
-function getLayout({xs,ys,title,sim,xrange,yrange}){
+function getLayout({xs,ys,title,sim,xrange,yrange,axis}){
   const items = [defaultLayout];
   function xaxis(obj){ if (obj) items.push({xaxis: obj}); }
   function yaxis(obj){ if (obj) items.push({yaxis: obj}); }
   const caseid = sim && sim.config && sim.config.caseid;
   const tag = sim && sim.config && sim.config.tag;
   items.push({ title: { text: (title || '')+annotation({caseid,tag}) } });
-  if (xs){
+  if (axis){
+    xaxis(axisTitle(axis.key));
+  } else if (xs){
     xaxis(axisTitle(xs));
     xaxis(xrange? ({range: xrange}) : (axisRange(xs,sim)));
   }
@@ -385,6 +387,19 @@ export function competitiveEquilibriumModel({demand,supply}){
   return ceModel;
 }
 
+/**
+ * simName(sim, axis) finds a name for a sim in a study-level chart
+ */
+
+function simName(sim,axis,j){
+  const name = ''+(
+    (axis && axis.values && axis.values[j]) ||
+    sim.config.tag ||
+    sim.config.caseid ||
+    j
+  );
+  return name;
+}
 
 /* this exports all the functions below, and also assigns them to the helpers object.
  * Depending on the version of the babel compiler, sometimes it exports the helpers object because exports are static and not dynamically computed in es6 ... which might be counterintuitive.
@@ -507,7 +522,7 @@ export const helpers = {
 
   boxplotFactory(chart) {
     // requires log, y, input='study'
-    return function (sims) {
+    return function (sims, axis) {
       if (!Array.isArray(sims))
         throw new Error("boxplot requires an array of multiple simulations");
       const data = sims.map((sim, j) => {
@@ -520,7 +535,7 @@ export const helpers = {
           console.log("boxplotFactory: error, no data for simulation "+j);
           console.log(e);
         }
-        const name = ''+(sim.config.tag || sim.config.caseid);
+        const name = simName(sim,axis,j);
         return {
           y,
           name,
@@ -531,7 +546,8 @@ export const helpers = {
       });
       const layout = getLayout({
         title: chart.title,
-        ys: [chart.y]
+        ys: [chart.y],
+        axis
       });
       return [data, layout];
     };
@@ -540,7 +556,7 @@ export const helpers = {
   violinFactory(chart) {
     // requires log, y, input='study'
 
-    return function (sims) {
+    return function (sims, axis) {
       if (!Array.isArray(sims))
         throw new Error("violin requires an array of multiple simulations");
       const data = sims.map((sim, j) => {
@@ -553,7 +569,7 @@ export const helpers = {
           console.log("violinFactory: error, no data for simulation "+j);
           console.log(e);
         }
-        const name = ''+(sim.config.tag || sim.config.caseid);
+        const name = simName(sim,axis,j);
         return {
           y,
           name,
@@ -567,7 +583,8 @@ export const helpers = {
       });
       const layout = getLayout({
         title: chart.title,
-        ys: [chart.y]
+        ys: [chart.y],
+        axis
       });
       return [data, layout];
     };
@@ -824,10 +841,10 @@ export const helpers = {
 
   smartPlotAgentProfits(chart){
     const numberOfPlots = +(chart.numberOfPlots) || 4;
-    return function(sims){
+    return function(sims, axis){
       if (!Array.isArray(sims))
         throw new Error("smartPlotAgentProfitsVsCaseId requires an array of multiple simulations");
-      const cases = sims.map((sim, j)=>(''+(sim.config.tag || sim.config.caseid || j)));
+      const cases = sims.map((sim, j)=>(simName(sim,axis,j)));
       // here we've assumed all simulations have the same number of buyers and sellers
       // ideally we should _verify_ first
       const { numberOfBuyers, numberOfSellers } = sims[0].config;
@@ -887,8 +904,8 @@ export const helpers = {
       const layout = deepmerge(
         getLayout({
           title: chart.title || "Average Profit comparison",
-          xs:'caseId',
-          ys:'profit'
+          ys:'profit',
+          axis
         }),
         chart.layout || {}
       );
