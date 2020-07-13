@@ -110,7 +110,8 @@ class PlotlyDataLayoutConfig {
     const config = this.config;
     config.staticPlot = !isInteractive;
     config.displayModeBar = isInteractive;
-    config.showSendToCloud = isInteractive;
+    config.showEditInChartStudio = isInteractive;
+    config.editable = isInteractive;
     return this;
   }
   /**
@@ -207,7 +208,8 @@ class VisualizationFactory {
     this.layout = {};
     this.config = {
       responsive: true,
-      displaylogo: false
+      displaylogo: false,
+      plotlyServerURL: "https://chart-studio.plotly.com"
     };
   }
 
