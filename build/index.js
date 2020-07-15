@@ -377,6 +377,7 @@ function getLayout({
   ys,
   title,
   sim,
+  sims,
   xrange,
   yrange,
   axis
@@ -408,6 +409,16 @@ function getLayout({
 
   if (axis) {
     xaxis(axisTitle(axis.key));
+  } else if (Array.isArray(sims)) {
+    if (sims && sims[0] && sims[0].tag) {
+      xaxis({
+        title: 'tag'
+      });
+    } else {
+      xaxis({
+        title: 'case id'
+      });
+    }
   } else if (xs) {
     xaxis(axisTitle(xs));
     xaxis(xrange ? {
@@ -696,6 +707,7 @@ const helpers = {
       const layout = getLayout({
         title: chart.title,
         ys: [chart.y],
+        sims,
         axis
       });
       return [data, layout];
@@ -735,6 +747,7 @@ const helpers = {
       const layout = getLayout({
         title: chart.title,
         ys: [chart.y],
+        sims,
         axis
       });
       return [data, layout];
@@ -906,9 +919,11 @@ const helpers = {
           domain: [0, 0.8]
         }),
         xaxis2: Object.assign({}, axiscommon, {
+          title: 'n',
           domain: [0.8, 1]
         }),
         yaxis2: Object.assign({}, axiscommon, {
+          title: 'n',
           domain: [0.8, 1]
         })
       }, chart.layout || {}]);

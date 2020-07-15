@@ -304,7 +304,7 @@ function annotation({caseid, tag}){
   return (a1 || a2)? ('<br>'+a1+a2) : '';
 }
 
-function getLayout({xs,ys,title,sim,xrange,yrange,axis}){
+function getLayout({xs,ys,title,sim,sims,xrange,yrange,axis}){
   const items = [defaultLayout];
   function xaxis(obj){ if (obj) items.push({xaxis: obj}); }
   function yaxis(obj){ if (obj) items.push({yaxis: obj}); }
@@ -313,6 +313,12 @@ function getLayout({xs,ys,title,sim,xrange,yrange,axis}){
   items.push({ title: { text: (title || '')+annotation({caseid,tag}) } });
   if (axis){
     xaxis(axisTitle(axis.key));
+  } else if (Array.isArray(sims)) {
+    if (sims && sims[0] && sims[0].tag){
+      xaxis({title: 'tag'});
+    } else {
+      xaxis({title: 'case id'});
+    }
   } else if (xs){
     xaxis(axisTitle(xs));
     xaxis(xrange? ({range: xrange}) : (axisRange(xs,sim)));
@@ -549,6 +555,7 @@ export const helpers = {
       const layout = getLayout({
         title: chart.title,
         ys: [chart.y],
+        sims,
         axis
       });
       return [data, layout];
@@ -586,6 +593,7 @@ export const helpers = {
       const layout = getLayout({
         title: chart.title,
         ys: [chart.y],
+        sims,
         axis
       });
       return [data, layout];
@@ -763,10 +771,10 @@ export const helpers = {
             axiscommon, { domain: [0, 0.8] }
           ),
           xaxis2: Object.assign({},
-            axiscommon, { domain: [0.8, 1] }
+            axiscommon, { title: 'n', domain: [0.8, 1] }
           ),
           yaxis2: Object.assign({},
-            axiscommon, { domain: [0.8, 1] }
+            axiscommon, { title: 'n', domain: [0.8, 1] }
           )
         },
         chart.layout || {}
