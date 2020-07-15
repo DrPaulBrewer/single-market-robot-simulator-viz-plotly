@@ -630,12 +630,17 @@ export const helpers = {
           [mymin, mymax] = layout.xaxis.range;
       }
       if ((mymin===undefined) || (mymax===undefined)){
-        mymin = d3A.min(traces, function (trace) {
-          return d3A.min(trace.x);
-        });
-        mymax = d3A.max(traces, function (trace) {
-          return d3A.max(trace.x);
-        });
+        mymin = Math.floor(
+          d3A.min(traces, function (trace) {
+            return d3A.min(trace.x);
+          })
+        );
+        mymax = Math.ceil(
+          d3A.max(traces, function (trace) {
+            return d3A.max(trace.x);
+          })
+        );
+        if (mymax!==1) mymax += 1; // hack to include right limit in integer-valued x data
         layout.xaxis.range = [mymin,mymax];
       }
       let binsize = 1;
