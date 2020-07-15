@@ -314,7 +314,7 @@ function getLayout({xs,ys,title,sim,sims,xrange,yrange,axis}){
   if (axis){
     xaxis(axisTitle(axis.key));
   } else if (Array.isArray(sims)) {
-    if (sims && sims[0] && sims[0].tag){
+    if (sims && sims[0] && sims[0].config.tag){
       xaxis({title: 'tag'});
     } else {
       xaxis({title: 'case id'});
