@@ -832,33 +832,23 @@ const helpers = {
   },
 
   histogram2DFactory(chart) {
-    /* req chart properties are title, names, logs, vars */
-    ['names', 'logs', 'vars'].forEach(function (prop) {
+    /* req chart properties are title, log, names[2], vars[2] */
+    ['names', 'vars'].forEach(function (prop) {
       if (!Array.isArray(chart[prop])) throw new Error("histogram2DFactory: Expected array for chart." + prop + " got: " + typeof chart[prop]);
-      if (chart[prop].length === 0 || chart[prop].length > 2) throw new Error("histogram2DFactory: Expected " + prop + " to be array of length 1 or 2, got: " + chart[prop].length);
+      if (chart[prop].length !== 2) throw new Error("histogram2DFactory: Expected " + prop + " to be array of length 2, got: " + chart[prop].length);
     });
     return function (sim) {
-      let series = [[], []];
-
-      try {
-        series = chart.names.map(function (name, i) {
-          let mylog = chart.logs[i % chart.logs.length];
-          let mylet = chart.vars[i % chart.vars.length];
-          const data = (0, _transpluck.default)(extract(sim.logs[mylog]), {
-            pluck: [mylet]
-          })[mylet];
-          assertContiguousFiniteNumberArray(data);
-          return data;
-        });
-      } catch (e) {
-        console.log("histogram2DFactory: error, no data");
-        console.log(e);
-        series = [[], []];
-      }
-
+      const [xvar, yvar] = chart.vars;
+      const data = (0, _transpluck.default)(extract(sim.logs[chart.log], {
+        pluck: chart.vars
+      }));
+      const x = data[xvar];
+      const y = data[yvar];
+      assertContiguousFiniteNumberArray(x);
+      assertContiguousFiniteNumberArray(y);
       let points = Object.assign({}, {
-        x: series[0],
-        y: series[1],
+        x,
+        y,
         mode: 'markers',
         name: 'points',
         marker: {
@@ -868,8 +858,8 @@ const helpers = {
         }
       }, chart.points);
       let density = Object.assign({}, {
-        x: series[0],
-        y: series[1],
+        x,
+        y,
         name: 'density',
         ncontours: 30,
         colorscale: 'Hot',
@@ -878,7 +868,7 @@ const helpers = {
         type: 'histogram2dcontour'
       }, chart.density);
       let upper = Object.assign({}, {
-        x: series[0],
+        x,
         name: chart.names[0],
         marker: {
           color: points.marker.color
@@ -887,7 +877,7 @@ const helpers = {
         type: 'histogram'
       }, chart.upper);
       let right = Object.assign({}, {
-        y: series[1],
+        y,
         name: chart.names[1],
         marker: {
           color: points.marker.color
