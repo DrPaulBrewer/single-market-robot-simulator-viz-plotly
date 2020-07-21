@@ -1,114 +1,107 @@
 [
   {
     "f": "violinFactory",
-    "title": "[v] Compare Trade price distributions",
+    "group": "Study Summary",
+    "title": "[kde] Compare Trade price distributions",
+    "input": "study",
+    "log": "trade",
+    "y": "price"
+  },
+  {
+    "f": "boxplotFactory",
+    "group": "Study Summary",
+    "title": "[box] Compare Trade price distributions",
     "input": "study",
     "log": "trade",
     "y": "price"
   },
   {
     "f": "violinFactory",
-    "title": "[v] Compare Closing price distributions",
+    "group": "Study Summary",
+    "title": "[kde] Compare Closing price distributions",
     "input": "study",
     "log":"ohlc",
     "y": "closePrice"
   },
   {
+    "f": "boxplotFactory",
+    "group": "Study Summary",
+    "title": "[box] Compare Closing price distributions",
+    "input": "study",
+    "log":"ohlc",
+    "y": "closePrice"
+  },
+  {
+    "f": "violinFactory",
+    "group": "Study Summary",
+    "title": "[kde] Compare Efficiency of Allocation",
+    "input": "study",
+    "log": "effalloc",
+    "y": "efficiencyOfAllocation"
+  },
+  {
+    "f": "boxplotFactory",
+    "title": "[box] Compare Efficiency of Allocation",
+    "group": "Study Summary",
+    "input": "study",
+    "log": "effalloc",
+    "y": "efficiencyOfAllocation"
+  },
+  {
+    "f": "violinFactory",
+    "group": "Study Summary",
+    "title": "[kde] Compare Trade Volume distributions",
+    "input": "study",
+    "log": "ohlc",
+    "y": "volume"
+  },
+  {
+    "f": "boxplotFactory",
+    "title": "[box] Compare Trade Volume distributions",
+    "group": "Study Summary",
+    "input": "study",
+    "log": "ohlc",
+    "y": "volume"
+  },
+  {
+    "f": "violinFactory",
+    "group": "Study Summary",
+    "title": "[kde] Compare Gini coefficient distributions",
+    "input": "study",
+    "log": "ohlc",
+    "y": "gini"
+  },
+  {
+    "f": "boxplotFactory",
+    "title":"[box] Compare Gini coefficient distributions",
+    "group": "Study Summary",
+    "input": "study",
+    "log": "ohlc",
+    "y": "gini"
+  },
+  {
     "f": "smartPlotAgentProfits",
+    "group": "Study Summary",
     "title": "[s] Compare Average Profit: All Agents",
     "input": "study",
     "numberOfPlots": 10000
   },
   {
     "f": "smartPlotAgentProfits",
-    "title": "[s] Compare Average Profit: 4 group max-min-d classifier",
+    "group": "Study Summary",
+    "title": "[s] Compare Average Profit: 4 Agent max-min-d classifier",
     "input": "study",
     "numberOfPlots": 4
   },
   {
-    "f": "violinFactory",
-    "title": "[v] Compare Efficiency of Allocation",
-    "input": "study",
-    "log": "effalloc",
-    "y": "efficiencyOfAllocation"
-  },
-  {
-    "f": "violinFactory",
-    "title": "[v] Compare Trade Volume distributions",
-    "input": "study",
-    "log": "ohlc",
-    "y": "volume"
-  },
-  {
-    "f": "violinFactory",
-    "title": "[v] Compare Gini coefficient distributions",
-    "input": "study",
-    "log": "ohlc",
-    "y": "gini"
-  },
-  {
-    "f": "boxplotFactory",
-    "title": "[b] Compare Trade price distributions",
-    "input": "study",
-    "log": "trade",
-    "y": "price"
-  },
-  {
-    "f": "boxplotFactory",
-    "title": "[b] Compare Closing price distributions",
-    "input": "study",
-    "log":"ohlc",
-    "y": "closePrice"
-  },
-  {
-    "f": "boxplotFactory",
-    "title": "[b] Compare Efficiency of Allocation",
-    "input": "study",
-    "log": "effalloc",
-    "y": "efficiencyOfAllocation"
-  },
-  {
-    "f": "boxplotFactory",
-    "title": "[b] Compare Trading Volume distributions",
-    "input": "study",
-    "log": "ohlc",
-    "y": "volume"
-  },
-  {
-    "f": "boxplotFactory",
-    "title":"[b] Compare Gini coefficient distributions",
-    "input": "study",
-    "log": "ohlc",
-    "y": "gini"
-  },
-  { "f": "plotFactory",
-    "title": "[ts] trade prices vs. time",
-    "log": "trade",
-    "names": ["trades"],
-    "xs": ["t"],
-    "ys": ["price"],
-    "modes": ["markers+lines"]
-  },
-  { "f": "plotFactory",
-    "title": "[s] trade volume vs. period",
-    "log": "ohlc",
-    "names": ["volume"],
-    "xs": ["period"],
-    "ys": ["volume"],
-    "modes": ["markers"]
-  },
-  {
-    "f": "plotFactory",
-    "title": "[s] Period open,high,low,close trade prices",
-    "log": "ohlc",
-    "names": ["open", "high", "low", "close"],
-    "xs": ["period"],
-    "ys": ["openPrice", "highPrice", "lowPrice", "closePrice"],
-    "modes": ["markers", "markers", "markers", "lines+markers"]
+    "f": "plotProfitDistributionViolin",
+    "group": "Agent Profits",
+    "title": "[v] Profit Distribution vs. Agent Id/Type"
   },
   {
     "f": "plotFactory",
     "title": "[ts] Bid, Ask, Trade prices vs. time",
+    "group": "Time Series",
     "names": ["bids", "asks", "trades"],
     "logs": ["buyorder", "sellorder", "trade"],
     "modes": ["markers", "markers", "lines+markers"],
@@ -117,22 +110,19 @@
     "agentcolors": ["id","id",""],
     "symbols": ["triangle-up","triangle-down","circle"]
   },
-  {
-    "f": "plotFactory",
-    "title": "[s] Gini Coefficient vs. period",
-    "log": "ohlc",
-    "names": ["gini"],
-    "xs": ["period"],
-    "ys": ["gini"],
-    "modes": ["markers"]
-  },
-  {
-    "f": "plotProfitDistributionViolin",
-    "title": "[v] Profit Distribution vs. Agent Id/Type"
+  { "f": "plotFactory",
+    "title": "[ts] trade prices vs. time",
+    "group": "Time Series",
+    "log": "trade",
+    "names": ["trades"],
+    "xs": ["t"],
+    "ys": ["price"],
+    "modes": ["markers+lines"]
   },
   {
     "f": "plotFactory",
     "title": "[ts] Trade profitability vs. time",
+    "group": "Time Series",
     "log": "trade",
     "names": ["trade","unit value","unit cost"],
     "xs": ["t"],
@@ -140,65 +130,85 @@
     "modes": ["markers+lines","markers","markers"]
   },
   {
+    "f": "plotFactory",
+    "title": "[s] Period open,high,low,median,mean,close trade prices",
+    "group": "Period Series",
+    "log": "ohlc",
+    "names": ["open", "high", "low", "close","median","mean"],
+    "xs": ["period"],
+    "ys": ["openPrice", "highPrice", "lowPrice", "closePrice","medianPrice","meanPrice"],
+    "modes": ["markers", "markers", "markers", "markers", "markers+lines", "markers"]
+  },
+  { "f": "plotFactory",
+    "title": "[s] trade volume vs. period",
+    "group": "Period Series",
+    "log": "ohlc",
+    "names": ["volume"],
+    "xs": ["period"],
+    "ys": ["volume"],
+    "modes": ["markers"]
+  },
+  {
     "f": "plotProfitTimeSeries",
+    "group": "Period Series",
     "title": "[s] Profit of each agent vs. period"
   },
   {
     "f": "histogramFactory",
-    "title": "[h] orders(y) vs. price (x) distribution",
-    "names": ["buyLimitPrice","sellLimitPrice"],
-    "logs": ["buyorder","sellorder"],
-    "vars": ["buyLimitPrice","sellLimitPrice"]
-  },
-  {
-    "f": "histogramFactory",
-    "title": "[h] periods (y) vs. Gini Coefficient (x) distribution",
-    "names": ["gini"],
+    "title": "[hs] periods(y) vs. price(x) histogram",
+    "group": "Histograms: Count Periods",
+    "names": ["open","high","low","close","median","mean"],
     "logs": ["ohlc"],
-    "vars": ["gini"],
-    "range": [0.0, 1.0],
-    "bins": 100
-  },
-  {
-    "f": "histogramFactory",
-    "title": "[h] periods (y) vs. efficiency of allocation pct (x)",
-    "names": ["efficiencyOfAllocation"],
-    "logs": ["effalloc"],
-    "vars": ["efficiencyOfAllocation"],
-    "range": [0, 100],
-    "bins": 100
-  },
-  {
-    "f": "histogram2DFactory",
-    "title": "[hs] close price(y) by volume(x)",
-    "names": ["volume", "close"],
-    "logs": ["ohlc"],
-    "vars": ["volume", "closePrice"]
-  },
-  {
-    "f": "histogram2DFactory",
-    "title": "[hs] close price(y) vs open price(x)",
-    "names": ["open", "close"],
-    "logs": ["ohlc"],
-    "vars": ["openPrice", "closePrice"]
-  },
-  {
-    "f": "histogram2DFactory",
-    "title": "[hs] trade price(y) vs time in period (tp)",
-    "names": ["time", "price"],
-    "logs": ["trade"],
-    "vars": ["tp", "price"]
+    "vars": ["openPrice","highPrice","lowPrice","closePrice","medianPrice","meanPrice"]
   },
   {
     "f": "histogramFactory",
     "title": "[hs] periods (y) by volume(x) histogram",
+    "group": "Histograms: Count Periods",
     "names": ["volume"],
     "logs": ["ohlc"],
     "vars": ["volume"]
   },
   {
     "f": "histogramFactory",
+    "title": "[h] periods (y) vs. efficiency of allocation pct (x)",
+    "group": "Histograms: Count Periods",
+    "names": ["efficiencyOfAllocation"],
+    "logs": ["effalloc"],
+    "vars": ["efficiencyOfAllocation"],
+    "range": [0, 101],
+    "bins": 101
+  },
+  {
+    "f": "histogramFactory",
+    "title": "[h] periods (y) vs. Gini Coefficient (x) distribution",
+    "group": "Histograms: Count Periods",
+    "names": ["gini"],
+    "logs": ["ohlc"],
+    "vars": ["gini"],
+    "range": [0.0, 1.01],
+    "bins": 101
+  },
+  {
+    "f": "histogram2DFactory",
+    "group": "2D Histograms: Count Periods",
+    "title": "[hs] close price(y) by volume(x)",
+    "names": ["volume", "close"],
+    "log": "ohlc",
+    "vars": ["volume", "closePrice"]
+  },
+  {
+    "f": "histogram2DFactory",
+    "group": "2D Histograms: Count Periods",
+    "title": "[hs] close price(y) vs open price(x)",
+    "names": ["open", "close"],
+    "log": "ohlc",
+    "vars": ["openPrice", "closePrice"]
+  },
+  {
+    "f": "histogramFactory",
     "title": "[hs] trades(y) by price(x) histogram",
+    "group": "Histograms: Count Trades",
     "names": ["trades"],
     "logs": ["trade"],
     "vars": ["price"]
@@ -206,54 +216,70 @@
   {
     "f": "histogramFactory",
     "title": "[hs] trades(y) by profit(x) histogram",
+    "group": "Histograms: Count Trades",
     "names": ["buyer", "seller"],
-    "logs": ["trade"],
-    "vars": ["buyerProfit", "sellerProfit"]
-  },
-  {
-    "f": "histogram2DFactory",
-    "title": "[hs] sellerProfit(y) vs buyerProfit(x)",
-    "names": ["buyerProfit", "sellerProfit"],
     "logs": ["trade"],
     "vars": ["buyerProfit", "sellerProfit"]
   },
   {
     "f": "histogramFactory",
     "title": "[hs] trades(y) by cost/value(x) histogram",
+    "group": "Histograms: Count Trades",
     "names": ["buyer", "seller"],
     "logs": ["trade"],
     "vars": ["buyerValue", "sellerCost"]
   },
   {
-    "f": "histogram2DFactory",
-    "title": "[hs] buyerValue(y) vs sellerCost(x) trade histogram",
-    "names": ["seller", "buyer"],
-    "logs": ["trade"],
-    "vars": ["sellerCost", "buyerValue"]
-  },
-  {
     "f": "histogramFactory",
-    "title": "[h] trades(y) by time (tp) histogram",
+    "title": "[h] trades(y) by time in period (tp) histogram",
+    "group": "Histograms: Count Trades",
     "names": ["tp"],
     "logs": ["trade"],
     "vars": ["tp"]
   },
   {
+    "f": "histogram2DFactory",
+    "group": "2D Histograms: Count Trades",
+    "title": "[hs] trade price(y) vs time in period (tp)",
+    "names": ["time", "price"],
+    "log": "trade",
+    "vars": ["tp", "price"]
+  },
+  {
+    "f": "histogram2DFactory",
+    "title": "[hs] sellerProfit(y) vs buyerProfit(x)",
+    "group": "2D Histograms: Count Trades",
+    "names": ["buyerProfit", "sellerProfit"],
+    "log": "trade",
+    "vars": ["buyerProfit", "sellerProfit"]
+  },
+  {
+    "f": "histogram2DFactory",
+    "title": "[hs] buyerValue(y) vs sellerCost(x) trade histogram",
+    "group": "2D Histograms: Count Trades",
+    "names": ["seller", "buyer"],
+    "log": "trade",
+    "vars": ["sellerCost", "buyerValue"]
+  },
+  {
     "f": "histogramFactory",
-    "title": "[h] order price distributions",
-    "names": ["buyLimitPrice", "sellLimitPrice"],
-    "logs": ["buyorder", "sellorder"],
-    "vars": ["buyLimitPrice", "sellLimitPrice"]
+    "title": "[h] orders(y) vs. price (x) distribution",
+    "group": "Histograms: Count Orders",
+    "names": ["buyLimitPrice","sellLimitPrice"],
+    "logs": ["buyorder","sellorder"],
+    "vars": ["buyLimitPrice","sellLimitPrice"]
   },
   {
     "f": "histogramFactory",
     "title": "[h] order price accept/reject funnel",
+    "group": "Histograms: Count Orders",
     "names": ["OK buy order", "OK sell order", "rejected buy order", "rejected sell order"],
     "logs": ["buyorder", "sellorder", "rejectbuyorder", "rejectsellorder"],
     "vars": ["buyLimitPrice", "sellLimitPrice", "buyLimitPrice", "sellLimitPrice"]
   },
   {
     "f": "supplyDemand",
+    "group": "Supply/Demand Models",
     "title": "[model] CE Model: Demand and Supply from buyerValues/sellerCosts"
   }
 ]
