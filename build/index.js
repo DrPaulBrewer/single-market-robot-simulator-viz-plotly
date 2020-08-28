@@ -789,7 +789,7 @@ const helpers = {
       const data = [{
         x,
         y: yMean,
-        y_error: {
+        error_y: {
           // eslint-disable-line camelcase
           type: 'data',
           array: ySEM,

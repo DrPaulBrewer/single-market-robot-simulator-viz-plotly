@@ -636,7 +636,7 @@ export const helpers = {
         {
           x,
           y: yMean,
-          y_error: {  // eslint-disable-line camelcase
+          error_y: {  // eslint-disable-line camelcase
             type: 'data',
             array: ySEM,
             visible: true
