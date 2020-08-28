@@ -8,6 +8,14 @@
     "y": "price"
   },
   {
+    "f": "scatterFactory",
+    "group": "Study Summary",
+    "title": "[scatter] Compare mean Trade price",
+    "input": "study",
+    "log": "trade",
+    "y": "price"
+  },
+  {
     "f": "boxplotFactory",
     "group": "Study Summary",
     "title": "[box] Compare Trade price distributions",
