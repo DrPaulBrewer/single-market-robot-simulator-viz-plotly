@@ -34,6 +34,7 @@
     "market-pricing": "^1.5.0",
     "max-min-dist": "^1.0.1",
     "random-js": "^2.1.0",
+    "stats-lite": "^2.2.0",
     "transpluck": "^1.0.4"
   },
   "devDependencies": {

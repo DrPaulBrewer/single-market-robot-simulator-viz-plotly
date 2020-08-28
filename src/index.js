@@ -8,6 +8,7 @@ import clone from 'clone';
 import deepmerge from 'deepmerge';
 import decamelize from 'decamelize';
 import * as Random from 'random-js';
+import * as stats from 'stats-lite';
 import * as marketPricing from 'market-pricing';
 import MaxMinDist from 'max-min-dist';
 
@@ -600,6 +601,57 @@ export const helpers = {
     };
   },
 
+  scatterFactory(chart) {
+    // requires log, y, input='study'
+
+    return function (sims, axis) {
+      if (!Array.isArray(sims))
+        throw new Error("violin requires an array of multiple simulations");
+      let yMean=[],ySEM=[],x=[];
+      sims.forEach((sim,j)=>{
+        try {
+          const rawData = transpluck(
+            extract(sim.logs[chart.log], {pluck: [chart.y]})
+          )[chart.y];
+          if (rawData.length<=1)
+            throw new Error(`rawData has length ${rawData.length}`);
+          assertContiguousFiniteNumberArray(rawData);
+          yMean[j] = stats.mean(rawData);
+          // this is a standard error of the mean calculation
+          // it is calculated the "usual way" as the sample stdev / root(N)
+          // but that is biased, and distribution dependent
+          // Wikipedia has a decent discussion
+          ySEM[j] = stats.sampleStdev(rawData)/Math.sqrt(rawData.length);
+          x[j] = simName(sim,axis,j);
+        } catch(e){
+          delete yMean[j];
+          delete ySEM[j];
+          x[j] = simName(sim,axis,j);
+          console.log("scatterFactory: error, no data for simulation "+j);
+          console.log(e);
+        }
+      });
+      // see https://plotly.com/javascript/error-bars/
+      const data = [
+        {
+          x,
+          y: yMean,
+          y_error: {  // eslint-disable-line camelcase
+            type: 'data',
+            array: ySEM,
+            visible: true
+          }
+        }
+      ];
+      const layout = getLayout({
+        title: chart.title,
+        ys: [chart.y],
+        sims,
+        axis
+      });
+      return [data, layout];
+    };
+  },
 
   histogramFactory(chart) {
 
