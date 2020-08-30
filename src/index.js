@@ -942,8 +942,8 @@ export const helpers = {
         chartNames = similar.map((g)=>{
           const agentNames = g.map((id)=>(profitHeader[id]));
           if (g.length===1) return agentNames[0];
-          if (g.length<5) return agentNames.join(",");
-          return agentNames.slice(0,4).join(",")+`+${agentNames.length-4} more`;
+          if (g.length<6) return agentNames[0]+'~~'+agentNames.slice(1).join(",");
+          return agentNames[0]+'~~'+agentNames.slice(1,5).join(",")+`+${agentNames.length-5} more`;
         });
       }
       const traces = agentIndexesForChart.map(
