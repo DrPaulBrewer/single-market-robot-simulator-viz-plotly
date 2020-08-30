@@ -1,9 +1,8 @@
-single-market-robot-simulator-viz-plotly
-======
+# single-market-robot-simulator-viz-plotly
 
 Middleware to generate plot traces for plotly from single-market-robot-simulator's simulation logs.
 
-Used by robot-trading-webapp
+Used at [Econ1.Net](https://econ1.net) and by an older prototype, [robot-trading-webapp](https://github.com/drpaulbrewer/robot-trading-webapp)
 
 ## Installation
 
@@ -15,65 +14,25 @@ This module helps create visualizations of `single-market-robot-simulator` simul
 
 A particular visualization typically extracts row data contained in one or more simulations logs in browser memory into traces and layouts required by plotly.
 
-## Example 
+## Documentation
 
-     const Plotly = require('plotly.js');
-     const SMRS   = require('single-market-robot-simulator');
-     const Viz    = require('single-market-robot-simulator-viz-plotly');
-     var sim      = SMRS.runSimulation(...);
-     var supplyDemandChartMaker  = Viz.supplyDemand(); // returns function(sim)
-     var supplyDemandChartParams = supplyDemandChartMaker(sim);  // returns array containing [traces,layout] for Plotly.newPlot
-     supplyDemandChartParams.unshift('plotOutputDivId');  // insert1st parameter for Plotly.newPlot -- the div Id
-     Plotly.newPlot.apply(Plotly, supplyDemandChartParams);  // call Plotly.newPlot using the array for parameters
+The module has changed enough that the previously posted documentation may be incorrect.
 
-## Helper Functions
+To understand how this code is used, you can look at code in another module: [single-market-robot-simulator-app-framework](https://github.com/drpaulbrewer/single-market-robot-simulator-app-framework)
 
-### Simulation ETL for Layout
+Note that Plotly.js is not listed as a dependency or called.  This code does the Extract-Transform steps and it is expected that the calls to Plotly are done in other code.
 
-#### viz.yaxisRange({Simulation} sim)
-##### returns: {Object} layoutTraits
-Extracts yaxis range from simulation configuration limits in `sim.config.L` and `sim.config.H`
+## Tests
 
-### Simulation ETL for Charts
+Tests confirm that each of the visualizations defined in `./test/dataVisuals.json` will complete its extract-transform step when given randomized simulation data.
 
-#### viz.supplyDemand()
-##### returns: Function {Simulation}(sim)->{Array} [PlotlyTraces, PlotlyLayout]
-Returns data-transformation function creating two traces representing aggregate demand and supply parameters input to simulation.
+At this time, the tests are not elaborate enough to confirm that each visualization faithfully reproduces the simulation data. Instead, tests provide a means of detecting
+a feature regression before committing new code.
 
-#### viz.plotFactory({Object} chart) 
-##### returns: Function {Simulation}(sim)->{Array} [PlotlyTraces, PlotlyLayout]
-Returns data-transformation function for Plotly with title chart.title, creating a trace for each name in chart.names, using data from corresponding chart.logs, chart.xs, chart.ys, chart.modes
+## Copyright
 
-#### viz.histogramFactory({Object} chart)
-##### returns: Function {Simulation}(sim)->{Array} [PlotlyTraces, PlotlyLayout]
-Returns data-transformation function for Plotly with title chart.title, creating overlaid histograms for each name in chart.names, using data from corresponding chart.logs, chart.vars
+2016- Paul Brewer Economic and Financial Technology Consulting LLC
 
-Optional chart properties:  chart.range, a two element array `[min,max]`; chart.bins, number, the number of bins for all histograms in this chart 
-
-#### viz.histogram2DFactory({Object} chart)
-##### returns: Function {Simulation}(sim)->{Array} [PlotlyTraces, PlotlyLayout]
-Returns data-transformation function for Plotly with title chart.title, creating 2D contour plot with side histograms for 2 variables defined via arrays chart.names, chart.logs, chart.vars
-
-#### viz.plotOHLCTimeSeries()
-##### returns: Function {Simulation}(sim)->{Array} [PlotlyTraces, PlotlyLayout]
-Returns data-transformation function for Plotly for OHLC Open-High-Low-Close Time Series with closing prices rendered as points connected by lines and the other series only points, no lines.
-
-### Builder
-
-The module includes a builder function that can take a JSON array of objects and build an array of data tranformation functions.  This makes it easier to build visualizations without repetitive coding.
-
-Each element of the `arrayOfVisuals` should have these properties:
-
-* f:  {String} module function to call to build data-transformation function (i.e. "plotFactory", "histogramFactory", "histogram2DFactory")
-* chart properties appropriate to the function, i.e. title, names, logs, xs, ys, modes, vars, etc.  The chart object is not needed, only the properties.  
-
-The builder returns an array of functions for the visualizations.  The properties are attached to each function in a .meta property.
-
-### Copyright
-
-2016 Paul Brewer Economic and Financial Technology Consulting LLC
-
-### License
+## License
 
 MIT License
-
