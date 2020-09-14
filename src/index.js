@@ -607,7 +607,7 @@ export const helpers = {
     return function (sims, axis) {
       if (!Array.isArray(sims))
         throw new Error("violin requires an array of multiple simulations");
-      let yMean=[],ySEM=[],x=[];
+      let yMean=[],yStdev=[],x=[];
       sims.forEach((sim,j)=>{
         try {
           const rawData = transpluck(
@@ -617,15 +617,14 @@ export const helpers = {
             throw new Error(`rawData has length ${rawData.length}`);
           assertContiguousFiniteNumberArray(rawData);
           yMean[j] = stats.mean(rawData);
-          // this is a standard error of the mean calculation
-          // it is calculated the "usual way" as the sample stdev / root(N)
-          // but that is biased, and distribution dependent
-          // Wikipedia has a decent discussion
-          ySEM[j] = stats.sampleStdev(rawData)/Math.sqrt(rawData.length);
+          // this is the standard error of the data
+          // it is NOT the standard error of the mean
+          // it may not be possible to calculate a standard error of the mean for autocorrelated trade data
+          yStdev[j] = stats.sampleStdev(rawData);
           x[j] = simName(sim,axis,j);
         } catch(e){
           delete yMean[j];
-          delete ySEM[j];
+          delete yStdev[j];
           x[j] = simName(sim,axis,j);
           console.log("scatterFactory: error, no data for simulation "+j);
           console.log(e);
@@ -638,7 +637,7 @@ export const helpers = {
           y: yMean,
           error_y: {  // eslint-disable-line camelcase
             type: 'data',
-            array: ySEM,
+            array: yStdev,
             visible: true
           }
         }
