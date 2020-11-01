@@ -611,7 +611,8 @@ export const helpers = {
       sims.forEach((sim,j)=>{
         try {
           const rawData = transpluck(
-            extract(sim.logs[chart.log], {pluck: [chart.y]})
+            extract(sim.logs[chart.log]),
+            {pluck: [chart.y]}
           )[chart.y];
           if (rawData.length<=1)
             throw new Error(`rawData has length ${rawData.length}`);
@@ -734,7 +735,10 @@ export const helpers = {
 
     return function (sim) {
       const [xvar,yvar] = chart.vars;
-      const data = transpluck(extract(sim.logs[chart.log], {pluck: chart.vars}));
+      const data = transpluck(
+        extract(sim.logs[chart.log]),
+        {pluck: chart.vars}
+      );
       const x = data[xvar];
       const y = data[yvar];
       assertContiguousFiniteNumberArray(x);

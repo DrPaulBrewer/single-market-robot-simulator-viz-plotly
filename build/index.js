@@ -765,9 +765,9 @@ const helpers = {
           x = [];
       sims.forEach((sim, j) => {
         try {
-          const rawData = (0, _transpluck.default)(extract(sim.logs[chart.log], {
+          const rawData = (0, _transpluck.default)(extract(sim.logs[chart.log]), {
             pluck: [chart.y]
-          }))[chart.y];
+          })[chart.y];
           if (rawData.length <= 1) throw new Error("rawData has length ".concat(rawData.length));
           assertContiguousFiniteNumberArray(rawData);
           yMean[j] = stats.mean(rawData); // this is the standard error of the data
@@ -890,9 +890,9 @@ const helpers = {
     });
     return function (sim) {
       const [xvar, yvar] = chart.vars;
-      const data = (0, _transpluck.default)(extract(sim.logs[chart.log], {
+      const data = (0, _transpluck.default)(extract(sim.logs[chart.log]), {
         pluck: chart.vars
-      }));
+      });
       const x = data[xvar];
       const y = data[yvar];
       assertContiguousFiniteNumberArray(x);
