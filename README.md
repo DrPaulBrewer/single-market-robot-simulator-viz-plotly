@@ -1,6 +1,8 @@
 # single-market-robot-simulator-viz-plotly
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/DrPaulBrewer/single-market-robot-simulator-viz-plotly.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/DrPaulBrewer/single-market-robot-simulator-viz-plotly/alerts/)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/DrPaulBrewer/single-market-robot-simulator-viz-plotly.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/DrPaulBrewer/single-market-robot-simulator-viz-plotly/context:javascript)
 
-Middleware to generate plot traces for plotly from single-market-robot-simulator's simulation logs.
+Middleware to generate chart data for plotly from single-market-robot-simulator's simulation logs.
 
 Used at [Econ1.Net](https://econ1.net) and by an older prototype, [robot-trading-webapp](https://github.com/drpaulbrewer/robot-trading-webapp)
 
