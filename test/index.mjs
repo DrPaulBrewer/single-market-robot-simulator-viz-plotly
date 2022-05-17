@@ -1,16 +1,21 @@
 /* eslint-env node, mocha */
 /* eslint no-console: "off", newline-per-chained-call: "off" */
 
-import '@babel/polyfill';
 import assert from 'assert';
 import 'should';
-import * as VIZ from '../src/index.js';
+import * as VIZ from '../src/index.mjs';
 import * as singleMarketRobotSimulator from 'single-market-robot-simulator';
-import config1 from './sim1.json';
-import config2 from './sim2.json';
-import config3 from './sim3.json';
-import config4 from './sim4.json';
-import dataVisuals from './dataVisuals.json';
+import fs from 'fs';
+
+function readJSON(fname){
+  return JSON.parse(fs.readFileSync('./test/'+fname)); // eslint-disable-line no-sync
+}
+
+const config1 = readJSON('sim1.json');
+const config2 = readJSON('sim2.json');
+const config3 = readJSON('sim3.json');
+const config4 = readJSON('sim4.json');
+const dataVisuals = readJSON('dataVisuals.json');
 
 const { Simulation } = singleMarketRobotSimulator;
 
