@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/drpaulbrewer/single-market-robot-simulator-viz-plotly#readme",
   "dependencies": {
+    "clone": "^2.1.2",
     "d3-array": "^3.1.6",
     "decamelize": "1.2.0 <2",
     "deepmerge": "^4.2.2",

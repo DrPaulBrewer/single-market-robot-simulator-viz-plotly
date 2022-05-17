@@ -1,4 +1,32 @@
-/* global Plotly: true */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: index.mjs</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: index.mjs</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global Plotly: true */
 /* eslint consistent-this: ["error", "app", "that"] */
 /* eslint no-console: "off" */
 // noinspection JSUnusedGlobalSymbols,ExceptionCaughtLocallyJS
@@ -21,7 +49,7 @@ function toNumberOrZero(x){
 function isContiguousFiniteNumberArray(a){
   if (!Array.isArray(a)) return false;
   let i,l=a.length;
-  for(i=0;i<l;++i){
+  for(i=0;i&lt;l;++i){
     const n = a[i];
     if (
       (typeof(n)!=='number') ||
@@ -42,8 +70,8 @@ function tickText(primary,secondary){
     try {
       width = +window.screen.availWidth || +window.screen.width;
     } catch(e) {console.log(e);}
-    if (width && (width<500)) return primary;
-    return primary+'<br>'+secondary;
+    if (width &amp;&amp; (width&lt;500)) return primary;
+    return primary+'&lt;br>'+secondary;
 }
 
 function numberedStringArray(s,n){
@@ -100,14 +128,14 @@ export class PlotlyDataLayoutConfig {
   adjustTitle(modifier){
     const layout = this.layout;
     if (!layout.title) layout.title = {};
-    if (modifier.replace && (modifier.replace.length > 0)){
+    if (modifier.replace &amp;&amp; (modifier.replace.length > 0)){
       layout.title.text = modifier.replace;
     }
-    if (layout.title && layout.title.text) {
-      if (modifier.prepend && (modifier.prepend.length > 0))
-        layout.title.text = modifier.prepend + '<br>' +layout.title;
-      if (modifier.append && (modifier.append.length > 0))
-        layout.title.text += '<br>' + modifier.append;
+    if (layout.title &amp;&amp; layout.title.text) {
+      if (modifier.prepend &amp;&amp; (modifier.prepend.length > 0))
+        layout.title.text = modifier.prepend + '&lt;br>' +layout.title;
+      if (modifier.append &amp;&amp; (modifier.append.length > 0))
+        layout.title.text += '&lt;br>' + modifier.append;
     }
     return this;
   }
@@ -115,7 +143,7 @@ export class PlotlyDataLayoutConfig {
 
 function extractNestedConfig(sim, starter){
   const result = {};
-  if (sim && sim.config){
+  if (sim &amp;&amp; sim.config){
     const titleKeys = Object.keys(sim.config).filter((k)=>(k.startsWith(starter)));
     titleKeys.forEach((k)=>{
       const withoutStarter = k.slice(starter.length);
@@ -129,7 +157,7 @@ function extractNestedConfig(sim, starter){
 export class Visualization extends PlotlyDataLayoutConfig {
   show(div){
     try {
-      const lines = this.layout.title.text.split('<br>');
+      const lines = this.layout.title.text.split('&lt;br>');
       const width = window.screen.availWidth || window.screen.width;
       const charw = Math.floor(width/15); // 15 pixels per char is a guess
       const newlines = [];
@@ -142,11 +170,11 @@ export class Visualization extends PlotlyDataLayoutConfig {
             const word = words.shift();
             reformattedLine += word+' ';
             lineLimit -= word.length+1;
-          } while(words.length>0 && (lineLimit>=words[0].length));
+          } while(words.length>0 &amp;&amp; (lineLimit>=words[0].length));
           newlines.push(reformattedLine);
         }
       });
-      this.layout.title.text = newlines.join('<br>');
+      this.layout.title.text = newlines.join('&lt;br>');
     } catch(e){ console.log(e);}
 
     // Plotly.react restyles the existing div; Plotly.newPlot overwrites completely
@@ -180,10 +208,10 @@ export class VisualizationFactory  {
   load(options){
     const { from, to, title, isInteractive, axis } = options;
     if (!from) throw new Error("no data source for VisualizationFactory.load");
-    if (!Array.isArray(from) && (this.meta.input==='study')){
+    if (!Array.isArray(from) &amp;&amp; (this.meta.input==='study')){
       throw new Error("this visualization requires an array of simulations");
     }
-    if (Array.isArray(from) && (this.meta.input!=='study')){
+    if (Array.isArray(from) &amp;&amp; (this.meta.input!=='study')){
       const arrayOfVisualizations = [];
       from.forEach((sim,j)=>{
         // recursive call with single sim and div with appended index
@@ -206,7 +234,7 @@ export class VisualizationFactory  {
     v.setInteractivity(isInteractive);
     if (title){
       v.adjustTitle(title);
-    } else if (from && from.config){
+    } else if (from &amp;&amp; from.config){
       const simTitleModifier = extractNestedConfig(from, 'title');
       v.adjustTitle(simTitleModifier);
     }
@@ -245,7 +273,7 @@ export function getFilter(){
 }
 
 function sample(data) {
-  if ((data.length - 1) <= sampleSize)
+  if ((data.length - 1) &lt;= sampleSize)
     return data;
   const sampledData = Random.sample(MT, data.slice(1), sampleSize);
   sampledData.unshift(data[0].slice());
@@ -264,7 +292,7 @@ function hasAnyKeyword(vars, keyWords){
   if (Array.isArray(vars))
     return vars.some((v)=>(hasAnyKeyword(v,keyWords)));
   return (
-    (typeof(vars)==='string') &&
+    (typeof(vars)==='string') &amp;&amp;
     (keyWords.some((k)=>(vars.toLowerCase().includes(k.toLowerCase()))))
   );
 }
@@ -276,8 +304,8 @@ function hasPriceVars(vars){
 
 
 function axisTitle(vs){
-  const v1 = ((Array.isArray(vs) && (vs.length===1) && vs[0])) ||
-    ((typeof(vs)==='string') && vs);
+  const v1 = ((Array.isArray(vs) &amp;&amp; (vs.length===1) &amp;&amp; vs[0])) ||
+    ((typeof(vs)==='string') &amp;&amp; vs);
   let text = '';
   if (v1){
     text = decamelize(v1,' ');
@@ -289,8 +317,8 @@ function axisTitle(vs){
 
 function axisRange(vs, sim){
     if (hasPriceVars(vs)){
-      const h = sim && sim.config && sim.config.H;
-      return (h && {range: [0,+h]});
+      const h = sim &amp;&amp; sim.config &amp;&amp; sim.config.H;
+      return (h &amp;&amp; {range: [0,+h]});
     }
     if (hasAnyKeyword(vs,['efficiency'])){
       return {range: [0,100]};
@@ -303,20 +331,20 @@ function axisRange(vs, sim){
 function annotation({caseid, tag}){
   const a1 = (caseid===undefined)? '': (`case:${caseid} `);
   const a2 = (tag===undefined)? '': tag;
-  return (a1 || a2)? ('<br>'+a1+a2) : '';
+  return (a1 || a2)? ('&lt;br>'+a1+a2) : '';
 }
 
 function getLayout({xs,ys,title,sim,sims,xrange,yrange,axis}){
   const items = [defaultLayout];
   function xaxis(obj){ if (obj) items.push({xaxis: obj}); }
   function yaxis(obj){ if (obj) items.push({yaxis: obj}); }
-  const caseid = sim && sim.config && sim.config.caseid;
-  const tag = sim && sim.config && sim.config.tag;
+  const caseid = sim &amp;&amp; sim.config &amp;&amp; sim.config.caseid;
+  const tag = sim &amp;&amp; sim.config &amp;&amp; sim.config.tag;
   items.push({ title: { text: (title || '')+annotation({caseid,tag}) } });
   if (axis){
     xaxis(axisTitle(axis.key));
   } else if (Array.isArray(sims)) {
-    if (sims && sims[0] && sims[0].config.tag){
+    if (sims &amp;&amp; sims[0] &amp;&amp; sims[0].config.tag){
       xaxis({title: 'tag'});
     } else {
       xaxis({title: 'case id'});
@@ -351,9 +379,9 @@ export function plotFactory(chart) {
       try {
         const xvar = chart.xs[i % chart.xs.length];
         const yvar = chart.ys[i % chart.ys.length];
-        const agentcolorvar = Array.isArray(chart.agentcolors) && (chart.agentcolors[i % chart.agentcolors.length]);
-        marker.symbol = (Array.isArray(chart.symbols) && chart.symbols[i]) || "circle";
-        const logName = Array.isArray(chart.logs) && (chart.logs[i % chart.logs.length]);
+        const agentcolorvar = Array.isArray(chart.agentcolors) &amp;&amp; (chart.agentcolors[i % chart.agentcolors.length]);
+        marker.symbol = (Array.isArray(chart.symbols) &amp;&amp; chart.symbols[i]) || "circle";
+        const logName = Array.isArray(chart.logs) &amp;&amp; (chart.logs[i % chart.logs.length]);
         if (logName){
           const pluckvars = [xvar,yvar,agentcolorvar].filter((v)=>(v));
           series = transpluck(extract(sim.logs[logName]), { pluck: pluckvars });
@@ -361,7 +389,7 @@ export function plotFactory(chart) {
         x = series[xvar];
         y = series[yvar];
         // agent ids begin with 1 in single-market-robot-simulator but agent with id 1 is at sim.pool.agents[0]
-        if (agentcolorvar && Array.isArray(series[agentcolorvar])) {
+        if (agentcolorvar &amp;&amp; Array.isArray(series[agentcolorvar])) {
           color = series[agentcolorvar].map((id)=>(agentColorArray[id-1]));
           text  = series[agentcolorvar].map((id)=>(agentTextArray[id-1]));
           marker.color = color;
@@ -393,7 +421,7 @@ export function plotFactory(chart) {
 
 export function competitiveEquilibriumModel({demand,supply}){
   const ceModel = marketPricing.crossSingleUnitDemandAndSupply(demand,supply);
-  ceModel.summary = (ceModel && ceModel.p && ceModel.q)? ('CE: '+JSON.stringify(ceModel)): '';
+  ceModel.summary = (ceModel &amp;&amp; ceModel.p &amp;&amp; ceModel.q)? ('CE: '+JSON.stringify(ceModel)): '';
   return ceModel;
 }
 
@@ -403,7 +431,7 @@ export function competitiveEquilibriumModel({demand,supply}){
 
 function simName(sim,axis,j){
   return '' + (
-      (axis && axis.values && axis.values[j]) ||
+      (axis &amp;&amp; axis.values &amp;&amp; axis.values[j]) ||
       sim.config.tag ||
       sim.config.caseid ||
       j
@@ -425,7 +453,7 @@ export const helpers = {
         demandValues.push(0);
       }
       const H = Math.max(+sim.config.H,demandValues[0],supplyCosts[supplyCosts.length-1]);
-      if (supplyCosts[supplyCosts.length-1]<=H){
+      if (supplyCosts[supplyCosts.length-1]&lt;=H){
         supplyCosts.push(H+1);
       }
       const ceModel = competitiveEquilibriumModel({
@@ -434,15 +462,15 @@ export const helpers = {
       });
       const maxlen = Math.max(demandValues.length, supplyCosts.length);
       const minlen = Math.min(demandValues.length, supplyCosts.length);
-      const steps = (maxlen<=30);
+      const steps = (maxlen&lt;=30);
       const mode = steps? 'lines+markers' : 'markers';
       const type = 'scatter';
       const cutoff = Math.min(minlen+10,maxlen);
       const idxStep = Math.max(1,Math.ceil(minlen/50));
       const xD=[0],yD=[H+1],xS=[0],yS=[0];
       function include(i){
-        if (i<0) return;
-        if(i<demandValues.length){
+        if (i&lt;0) return;
+        if(i&lt;demandValues.length){
           const dVal = demandValues[i];
           if (steps) {
             const prev = yD[yD.length-1];
@@ -454,7 +482,7 @@ export const helpers = {
           xD.push(i+1);
           yD.push(dVal);
         }
-        if(i<supplyCosts.length){
+        if(i&lt;supplyCosts.length){
           const sCost = supplyCosts[i];
           if (steps){
             const prev = yS[yS.length-1];
@@ -477,14 +505,14 @@ export const helpers = {
         q0=0;
         q1=1;
       }
-      for(let i=0,l=q0-1;i<l;i+=idxStep)
+      for(let i=0,l=q0-1;i&lt;l;i+=idxStep)
         include(i);
       include(q0-1);
-      for(let i=q0,l=q1-1;i<l;i+=idxStep)
+      for(let i=q0,l=q1-1;i&lt;l;i+=idxStep)
         include(i);
       include(q1-1);
       if (cutoff>q1)
-        for (let i=q1,l=cutoff;i<l;i+=Math.min(cutoff-q1,idxStep))
+        for (let i=q1,l=cutoff;i&lt;l;i+=Math.min(cutoff-q1,idxStep))
           include(i);
 
       let demand = {
@@ -518,7 +546,7 @@ export const helpers = {
             }
           },
           title: {
-            text: " S/D Model <br>Case "+sim.config.caseid+"<br><sub>"+ceModel.summary+"</sub>"
+            text: " S/D Model &lt;br>Case "+sim.config.caseid+"&lt;br>&lt;sub>"+ceModel.summary+"&lt;/sub>"
           }
         }
       ]);
@@ -614,7 +642,7 @@ export const helpers = {
             extract(sim.logs[chart.log]),
             {pluck: [chart.y]}
           )[chart.y];
-          if (rawData.length<=1)
+          if (rawData.length&lt;=1)
             throw new Error(`rawData has length ${rawData.length}`);
           assertContiguousFiniteNumberArray(rawData);
           yMean[j] = stats.mean(rawData);
@@ -686,7 +714,7 @@ export const helpers = {
         {barmode: 'overlay'}
       );
       let mymin, mymax;
-      if (layout && layout.xaxis && (layout.xaxis.range)){
+      if (layout &amp;&amp; layout.xaxis &amp;&amp; (layout.xaxis.range)){
           [mymin, mymax] = layout.xaxis.range;
       }
       if ((mymin===undefined) || (mymax===undefined)){
@@ -877,14 +905,14 @@ export const helpers = {
         numberedStringArray('B',sim.config.numberOfBuyers),
         numberedStringArray('S',sim.config.numberOfSellers)
       );
-      for (let i = 0, l = sim.numberOfAgents;i<l;++i)
+      for (let i = 0, l = sim.numberOfAgents;i&lt;l;++i)
         traces.push({
           x: column.period,
           y: column['y'+(i+1)],
           name: profitHeader[i],
           mode: 'markers',
           marker: {
-            symbol: ((i < sim.numberOfBuyers) ? "circle" : "square")
+            symbol: ((i &lt; sim.numberOfBuyers) ? "circle" : "square")
           },
           type: 'scatter'
         });
@@ -924,7 +952,7 @@ export const helpers = {
             .map((sim) => {
               const profitData = extract(sim.logs.profit);
               const col = profitData[0].indexOf('y' + (j + 1)); // y columns begin with y1
-              if (col < 0) throw new Error("smartPlotAgentProfits: could not find column for profit data");
+              if (col &lt; 0) throw new Error("smartPlotAgentProfits: could not find column for profit data");
               const periods = profitData.length - 1; // -1 because header is not a period
               let sum = 0;
               profitData.forEach((row, k) => {
@@ -947,7 +975,7 @@ export const helpers = {
         chartNames = similar.map((g)=>{
           const agentNames = g.map((id)=>(profitHeader[id]));
           if (g.length===1) return agentNames[0];
-          if (g.length<6) return agentNames[0]+'~~'+agentNames.slice(1).join(",");
+          if (g.length&lt;6) return agentNames[0]+'~~'+agentNames.slice(1).join(",");
           return agentNames[0]+'~~'+agentNames.slice(1,5).join(",")+`+${agentNames.length-5} more`;
         });
       }
@@ -959,7 +987,7 @@ export const helpers = {
             name: chartNames[k],
             mode: 'lines+markers',
             marker: {
-              symbol: ((agentIndex < numberOfBuyers) ? "circle" : "square")
+              symbol: ((agentIndex &lt; numberOfBuyers) ? "circle" : "square")
             },
             type: 'scatter'
           }
@@ -990,3 +1018,26 @@ export function build(arrayOfVisuals) {
     }
   });
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#simName">simName</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Tue May 17 2022 19:51:13 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
