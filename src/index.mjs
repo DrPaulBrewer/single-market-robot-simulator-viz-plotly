@@ -131,15 +131,12 @@ export class PlotlyDataLayoutConfig {
    * @param {object} options.layout Layout for the chart
    * @param {object} options.config  Config for the chart
    * @param {boolean} options.isInteractive true for interactive chart
-   * @param {?{prepend: ?string, append: ?string, replace: ?string}} options.title Title modifiers
    */
   constructor(options){
     this.data = options.data || [];
     this.layout = options.layout || {};
     this.config = options.config || {};
     this.setInteractivity(options.isInteractive);
-    if (options.title){
-      this.adjustTitle(options.title);
     }
   }
 
@@ -161,20 +158,20 @@ export class PlotlyDataLayoutConfig {
 /**
  * Change Plotly plot title by prepending, appending, or replacing existing plot title
  *
- * @param {{prepend: ?string, append: ?string, replace: ?string}} modifier modifications to title
+ * @param {{prepend: ?string, append: ?string, replace: ?string}} adjustments adjustments to title
  */
-
-  adjustTitle(modifier){
+  adjustTitle(adjustments){
+    const {prepend, append, replace} = adjustments;
     const layout = this.layout;
     if (!layout.title) layout.title = {};
-    if (modifier.replace && (modifier.replace.length > 0)){
-      layout.title.text = modifier.replace;
+    if (typeof(replace)==='string' && (replace.length > 0)){
+      layout.title.text = replace;
     }
     if (layout.title && layout.title.text) {
-      if (modifier.prepend && (modifier.prepend.length > 0))
-        layout.title.text = modifier.prepend + '<br>' +layout.title;
-      if (modifier.append && (modifier.append.length > 0))
-        layout.title.text += '<br>' + modifier.append;
+      if (typeof(prepend)==='string' && (prepend.length > 0))
+        layout.title.text = prepend + '<br>' +layout.title.text;
+      if (typeof(append)==='string' && (append.length > 0))
+        layout.title.text += '<br>' + append;
     }
     return this;
   }
