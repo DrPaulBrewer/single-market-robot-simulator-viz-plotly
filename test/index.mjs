@@ -57,7 +57,7 @@ describe('visualizations', function(){
   it('should run each visualization OK on [sim1,sim2,sim3,sim4] with minimal sanity checking of output', function(){
     function testSingleLoadedViz(v, vl, j){
       const id = ` ${JSON.stringify(v.meta,null,2)} sim${(j+1)}`;
-      assert(vl instanceof VIZ.Visualization,"assert: vl is a VIZ.Visualization for "+id);
+      assert(vl instanceof VIZ.PlotlyDataLayoutConfig,"assert: vl is a VIZ.Visualization for "+id);
       assert(Array.isArray(vl.data),"assert vl.data is an array for "+id);
       vl.data.forEach((d)=>{
         if (d.x){

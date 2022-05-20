@@ -1,3 +1,4 @@
+/* eslint-env node */
 module.exports = {
     "env": {
         "browser": true,
@@ -5,11 +6,20 @@ module.exports = {
         "es6": true,
         "node": true
     },
-    "extends": "eslint:recommended",
+    "extends": ["eslint:recommended"],
     "parserOptions": {
-       "ecmaVersion": 8,
+       "ecmaVersion": 2020,
        "sourceType": "module"
     },
+    "overrides": [
+        {
+            "files": ["src/*.js"],
+            "extends": ["eslint:recommended", "plugin:jsdoc/recommended"]
+        }
+    ],
+    "plugins": [
+      "jsdoc"
+    ],
     "rules": {
         "accessor-pairs": "error",
         "array-bracket-spacing": "error",

@@ -3,7 +3,7 @@
 /* eslint no-console: "off" */
 // noinspection JSUnusedGlobalSymbols,ExceptionCaughtLocallyJS
 
-import * as d3A from 'd3-array';
+import {min,max} from 'd3-array';
 import transpluck from 'transpluck';
 import clone from 'clone';
 import deepmerge from 'deepmerge';
@@ -13,11 +13,29 @@ import * as stats from 'stats-lite';
 import * as marketPricing from 'market-pricing';
 import MaxMinDist from 'max-min-dist';
 
+/**
+ * A Simulation as defined in npm:single-market-robot-simulator
+ *
+ * @typedef {{}} Simulation
+ */
+
+/**
+ * Converts NaN to zero; preserves regular numbers
+ *
+ * @param {any} x An item to convert to a number or zero (if NaN)
+ * @returns {number|number} x or 0
+ */
 function toNumberOrZero(x){
   const n = +x;
   return (Number.isNaN(n))? 0: n;
 }
 
+/**
+ * Tests that a is an array, and every element is a finite number
+ *
+ * @param {any} a object to test
+ * @returns {boolean} true if every element of a is a finite number
+ */
 function isContiguousFiniteNumberArray(a){
   if (!Array.isArray(a)) return false;
   let i,l=a.length;
@@ -32,11 +50,25 @@ function isContiguousFiniteNumberArray(a){
   return true;
 }
 
+/**
+ * Throws an error if a is not an array where every element is a finite number
+ *
+ * @param {any} a Object to be tested
+ * @returns {void}
+ * @throws {Error} if object is not a contiguous, finite, numeric array
+ */
 function assertContiguousFiniteNumberArray(a){
   if (!isContiguousFiniteNumberArray(a))
     throw new Error("requires contiguous, finite, numeric data array --- found gaps or bad data");
 }
 
+/**
+ * Returns only primary on small screens
+ *
+ * @param {string} primary short, important message for small screens
+ * @param {string} secondary additional description for larger screens
+ * @returns {string} primary or primary+secondary
+ */
 function tickText(primary,secondary){
     let width;
     try {
@@ -46,6 +78,13 @@ function tickText(primary,secondary){
     return primary+'<br>'+secondary;
 }
 
+/**
+ * array of n strings labeled s1,s2,...sn
+ *
+ * @param {string} s label, e.g. Buyer
+ * @param {number} n count
+ * @returns {string[]} array of strings s1,s2,...,sn
+ */
 function numberedStringArray(s,n){
   return (
     new Array(n)
@@ -54,10 +93,22 @@ function numberedStringArray(s,n){
   );
 }
 
+/**
+ * Returns a color for each agent in the simulation
+ *
+ * @param {Simulation} sim Simulation
+ * @returns {string[]} array of color names
+ */
 function getAgentColors(sim){
   return sim.pool.agents.map((a)=>(a.color || 'darkviolet'));
 }
 
+/**
+ * Returns a short identitying string for each agent, e.g. B1 ZI, B2 ZI,...
+ *
+ * @param {Simulation} sim Simulation
+ * @returns {string[]} short identifying string for each agent
+ */
 function getAgentText(sim){
   const toBSID = [].concat(
     numberedStringArray('B',sim.config.numberOfBuyers),
@@ -67,7 +118,22 @@ function getAgentText(sim){
   return toBSID.map((id,j)=>(id+' '+toClass[j]));
 }
 
+/**
+ * Class to encapsulate data, layout, and config parameters of Plotly plots
+ */
+
 export class PlotlyDataLayoutConfig {
+
+  /**
+   *
+   * @param options Chart options
+   * @param {{}[]} options.data Data for the chart
+   * @param {{}} options.layout Layout for the chart
+   * @param {{}} options.config  Config for the chart
+   * @param {boolean} options.isInteractive true for interactive chart
+   * @param {?{prepend: ?string, append: ?string, replace: ?string}} options.title Title modifiers
+   */
+
   constructor(options){
     this.data = options.data || [];
     this.layout = options.layout || {};
@@ -80,7 +146,8 @@ export class PlotlyDataLayoutConfig {
 
   /**
    * Set Plotly interactivity
-   * @param isInteractive
+   *
+   * @param {boolean} isInteractive True for interactive chart
    */
 
   setInteractivity(isInteractive=false){
@@ -94,6 +161,7 @@ export class PlotlyDataLayoutConfig {
 
 /**
  * Change Plotly plot title by prepending, appending, or replacing existing plot title
+ *
  * @param {{prepend: ?string, append: ?string, replace: ?string}} modifier modifications to title
  */
 
@@ -113,12 +181,22 @@ export class PlotlyDataLayoutConfig {
   }
 }
 
-function extractNestedConfig(sim, starter){
+/**
+ * Extracts values from sim.config for keys that start with the prefix.
+ * Resulting object has keys which delete the start string and first char lowercased
+ * and values from the original sim.config object.
+ * NOTE: Structured values are by-reference, not cloned.
+ *
+ * @param {Simulation} sim Simulation
+ * @param {string} prefix Prefix; e.g. 'Buyer', 'Seller'
+ * @returns {{}} extracted key/value configuration
+ */
+function extractNestedConfig(sim, prefix){
   const result = {};
   if (sim && sim.config){
-    const titleKeys = Object.keys(sim.config).filter((k)=>(k.startsWith(starter)));
+    const titleKeys = Object.keys(sim.config).filter((k)=>(k.startsWith(prefix)));
     titleKeys.forEach((k)=>{
-      const withoutStarter = k.slice(starter.length);
+      const withoutStarter = k.slice(prefix.length);
       const newKey = withoutStarter[0].toLowerCase()+withoutStarter.slice(1);
       result[newKey] = sim.config[k];
     });
@@ -126,47 +204,61 @@ function extractNestedConfig(sim, starter){
   return result;
 }
 
-export class Visualization extends PlotlyDataLayoutConfig {
-  show(div){
-    try {
-      const lines = this.layout.title.text.split('<br>');
-      const width = window.screen.availWidth || window.screen.width;
-      const charw = Math.floor(width/15); // 15 pixels per char is a guess
-      const newlines = [];
-      lines.forEach((line)=>{
-        const words = line.split(' ');
-        while(words.length>0){
-          let lineLimit = charw;
-          let reformattedLine = '';
-          do {
-            const word = words.shift();
-            reformattedLine += word+' ';
-            lineLimit -= word.length+1;
-          } while(words.length>0 && (lineLimit>=words[0].length));
-          newlines.push(reformattedLine);
-        }
-      });
-      this.layout.title.text = newlines.join('<br>');
-    } catch(e){ console.log(e);}
+/**
+ *
+ * @param {PlotlyDataLayoutConfig} plot A PlotlyDataLayoutConfig
+ * @param {string} div The id of a div (omit leading '#')
+ * @returns {PlotlyDataLayoutConfig} plot the plotted plot
+ */
+export function displayPlotInDiv(plot, div){
+  try {
+    const lines = plot.layout.title.text.split('<br>');
+    const width = window.screen.availWidth || window.screen.width;
+    const charw = Math.floor(width/15); // 15 pixels per char is a guess
+    const newlines = [];
+    lines.forEach((line)=>{
+      const words = line.split(' ');
+      while(words.length>0){
+        let lineLimit = charw;
+        let reformattedLine = '';
+        do {
+          const word = words.shift();
+          reformattedLine += word+' ';
+          lineLimit -= word.length+1;
+        } while(words.length>0 && (lineLimit>=words[0].length));
+        newlines.push(reformattedLine);
+      }
+    });
+    plot.layout.title.text = newlines.join('<br>');
+  } catch(e){ console.log(e);}
 
-    // Plotly.react restyles the existing div; Plotly.newPlot overwrites completely
-    // 2020-Jun-05 PJB This code previously used Plot.react(div, this.data, this.layout, this.config);
-    // see https://plotly.com/javascript/plotlyjs-function-reference/
+  // Plotly.react restyles the existing div; Plotly.newPlot overwrites completely
+  // 2020-Jun-05 PJB This code previously used Plot.react(div, plot.data, plot.layout, plot.config);
+  // see https://plotly.com/javascript/plotlyjs-function-reference/
 
-    // choose only ONE
-    Plotly.newPlot(div, this.data, this.layout, this.config);
+  // choose only ONE
+  Plotly.newPlot(div, plot.data, plot.layout, plot.config);
 
-    // Plotly.react(div,this.data,this.layout,this.config);
+  // Plotly.react(div,plot.data,plot.layout,plot.config);
 
-    return this;
-  }
+  return this;
 }
 
+/**
+ * Factory class that can build visualizations from a specification and data
+ */
 export class VisualizationFactory  {
-  constructor(spec){
+
+  /**
+   * Create a VisualizationFactory
+   *
+   * @param {object} chart Specifications (see individual helperers for specific chart object)
+   * @param {string} chart.f function name within helpers
+   */
+  constructor(chart){
     // Legacy compatibility
-    this.meta = spec;
-    this.loader = helpers[spec.f](spec); // eslint-disable-line no-use-before-define
+    this.meta = chart;
+    this.loader = helpers[chart.f](chart); // eslint-disable-line no-use-before-define
     // Plotly default settings
     // this.data not initialized here
     this.layout = {};
@@ -177,6 +269,15 @@ export class VisualizationFactory  {
     };
   }
 
+  /**
+   * @param {{}} options options
+   * @param {Simulation[]|Simulation} options.from Data Input: A Simulation or an Array of Simulations
+   * @param {string} options.to Chart Destination: A div name
+   * @param {string} options.title Title at top of chart
+   * @param {boolean} options.isInteractive True for interactive chart
+   * @param {any} options.axis Helper specific
+   * @returns {PlotlyDataLayoutConfig|PlotlyDataLayoutConfig[]} Populated/plotted visualization
+   */
   load(options){
     const { from, to, title, isInteractive, axis } = options;
     if (!from) throw new Error("no data source for VisualizationFactory.load");
@@ -202,7 +303,7 @@ export class VisualizationFactory  {
     const [data,_layout,_config] = this.loader(from, axis);
     const layout = deepmerge(this.layout,_layout || {});
     const config = deepmerge(this.config,_config || {});
-    const v =  new Visualization({ data, layout, config});
+    const v =  new PlotlyDataLayoutConfig({ data, layout, config});
     v.setInteractivity(isInteractive);
     if (title){
       v.adjustTitle(title);
@@ -210,7 +311,7 @@ export class VisualizationFactory  {
       const simTitleModifier = extractNestedConfig(from, 'title');
       v.adjustTitle(simTitleModifier);
     }
-    if (to) return v.show(to);
+    if (to) return displayPlotInDiv(v, to);
     return v;
   }
 }
@@ -219,31 +320,66 @@ let defaultLayout = {};
 
 const MT = Random.MersenneTwister19937.autoSeed();
 
+/**
+ * set default Plotly layout
+ *
+ * @param {{}} layout A Plotly layout
+ * @returns {void}
+ */
 export function setDefaultLayout(layout) {
   defaultLayout = clone(layout);
 }
 
 let sampleSize = +Infinity;
 
+/**
+ * set default Plot Sample Size
+ *
+ * @param {number} newsize sample size, 1 to +Infinity
+ * @returns {number} sample size
+ */
 export function setSampleSize(newsize) {
   sampleSize = newsize;
   return sampleSize;
 }
 
+/**
+ * get default Plot sample size
+ *
+ * @returns {number} sample size
+ */
 export function getSampleSize() {
   return sampleSize;
 }
 
 let logFilter = null;
+
+/**
+ * set filter for data logs
+ *
+ * @param {{}} newFilter the filter
+ * @returns {{}} filter
+ */
 export function setFilter(newFilter){
   logFilter = newFilter;
   return logFilter;
 }
 
+/**
+ * get filter for data logs
+ *
+ * @returns {{}} filter
+ */
 export function getFilter(){
   return logFilter;
 }
 
+/**
+ * return a sample of data, preserving header row
+ *
+ * @param {any[]} data the full data array
+ * @returns {any[]} the sampled data array
+ */
 function sample(data) {
   if ((data.length - 1) <= sampleSize)
     return data;
@@ -252,6 +388,12 @@ function sample(data) {
   return sampledData;
 }
 
+/**
+ * Filters and randomly samples data from log's data
+ *
+ * @param {{}} log A simulation log as defined in npm:single-market-robot-simulator
+ * @returns {any[]} resulting data array
+ */
 function extract(log){
   if (logFilter === null)
     return sample(log.data);
@@ -260,6 +402,13 @@ function extract(log){
   return sample(data);
 }
 
+/**
+ * Tests whether some string in vars contains a keyword from keywords
+ *
+ * @param {string|string[]} vars A string or array to test
+ * @param {string[]} keyWords An array of keywords to find
+ * @returns {boolean} result true if vars contains, as a substring, some keyword
+ */
 function hasAnyKeyword(vars, keyWords){
   if (Array.isArray(vars))
     return vars.some((v)=>(hasAnyKeyword(v,keyWords)));
@@ -269,12 +418,23 @@ function hasAnyKeyword(vars, keyWords){
   );
 }
 
+/**
+ * True if the var or vars contains a prive keyword
+ *
+ * @param {string|string[]} vars A string or array of strings to search
+ * @returns {boolean} true if vars contains price, value or cost
+ */
 function hasPriceVars(vars){
   const keyWords = ['price','value','cost'];
   return hasAnyKeyword(vars,keyWords);
 }
 
-
+/**
+ * Plotly title property for variable(s) in vs
+ *
+ * @param {string[]|string} vs chart variables
+ * @returns {{title:string}} Plotly title property
+ */
 function axisTitle(vs){
   const v1 = ((Array.isArray(vs) && (vs.length===1) && vs[0])) ||
     ((typeof(vs)==='string') && vs);
@@ -287,6 +447,13 @@ function axisTitle(vs){
   return { title: { text }};
 }
 
+/**
+ * Suggested Pdlotly axis range for chart variables
+ *
+ * @param {string|string[]} vs chart variables
+ * @param {Simulation} sim Simulation
+ * @returns {{range:number[]}} Plotly range configuration
+ */
 function axisRange(vs, sim){
     if (hasPriceVars(vs)){
       const h = sim && sim.config && sim.config.H;
@@ -300,15 +467,53 @@ function axisRange(vs, sim){
     }
 }
 
-function annotation({caseid, tag}){
+/**
+ * Annotation for Simulation
+ *
+ * @param {Simulation} sim Simulation
+ * @param {number|string|undefined} sim.caseid The case id, if any, of a simulation within a study
+ * @param {number|string|undefined} sim.tag The tag, if any, of a simulation
+ * @returns {string} html annotation with initial line break
+ */
+function annotation(sim){
+  const {caseid, tag} = sim;
   const a1 = (caseid===undefined)? '': (`case:${caseid} `);
   const a2 = (tag===undefined)? '': tag;
   return (a1 || a2)? ('<br>'+a1+a2) : '';
 }
 
-function getLayout({xs,ys,title,sim,sims,xrange,yrange,axis}){
+/**
+ * Create the Plotly layout for a chart
+ *
+ * @param {object} options options
+ * @param {string|string[]} options.xs x-variable(s)
+ * @param {string|string[]} options.ys y-variable(s)
+ * @param {string} options.title title
+ * @param {Simulation} options.sim simulation
+ * @param {Simulation[]} options.sims array of simulations
+ * @param {number[]} options.xrange [xlow,xhigh] x-range
+ * @param {number[]} options.yrange [ylow,yhigh] y-range
+ * @param {{key:string}} options.axis axis option
+ * @returns {object} Plotly layout
+ */
+function getLayout(options){
+  const {xs,ys,title,sim,sims,xrange,yrange,axis} = options;
   const items = [defaultLayout];
+
+  /**
+   * Helper to push xaxis objects to items
+   *
+   * @param {{}} obj xaxis object
+   * @returns {void}
+   */
   function xaxis(obj){ if (obj) items.push({xaxis: obj}); }
+
+  /**
+   * Helper to push yaxis objects to items
+   *
+   * @param {{}} obj yaxis object
+   * @returns {void}
+   */
   function yaxis(obj){ if (obj) items.push({yaxis: obj}); }
   const caseid = sim && sim.config && sim.config.caseid;
   const tag = sim && sim.config && sim.config.tag;
@@ -332,9 +537,24 @@ function getLayout({xs,ys,title,sim,sims,xrange,yrange,axis}){
   return deepmerge.all(items);
 }
 
+/**
+ * Creates a function(Simulation)->[traces,layout] for Plotly charts
+ *
+ * @param {object} chart chart
+ * @param {string} chart.title title
+ * @param {string} chart.log log
+ * @param {string[]} chart.logs logs
+ * @param {string[]} chart.names names
+ * @param {string[]} chart.xs x-variables
+ * @param {string[]} chart.ys y-variables
+ * @param {string[]} chart.modes Plotly trace mode
+ * @param {string[]} chart.symbols Plotly marker symbols
+ * @param {string[]} chart.agentcolors colors for each agent
+ * @returns {Function} function from Simulation to [traces,layout]
+ */
 export function plotFactory(chart) {
 
-  /* chart properties are title, log or logs, names, xs, ys, modes, symbols, agentcolors, layout */
+  /* chart properties are title, log or logs, names, xs, ys, modes, symbols, agentcolors */
 
   return function (sim) {
     let series=null, agentColorArray=null, agentTextArray=null;
@@ -391,16 +611,31 @@ export function plotFactory(chart) {
   };
 }
 
-export function competitiveEquilibriumModel({demand,supply}){
+/**
+ * Run Competitive Equilibrium Supply/Demand Model
+ * append .summary property giving text summary of model prediction
+ *
+ * @param {object} scenario economic scenario consisting of {demand,suppy} arrays
+ * @param {number[]} scenario.demand demand (WTP) values sorted from high to low
+ * @param {number[]} scenario.supply supply (WTA) costs sorted from low to high
+ * @returns {object} {p,q,summary}
+ */
+export function competitiveEquilibriumModel(scenario){
+  const {demand,supply} = scenario;
   const ceModel = marketPricing.crossSingleUnitDemandAndSupply(demand,supply);
   ceModel.summary = (ceModel && ceModel.p && ceModel.q)? ('CE: '+JSON.stringify(ceModel)): '';
   return ceModel;
 }
 
-/**
- * simName(sim, axis) finds a name for a sim in a study-level chart
- */
 
+/**
+ * finds a sensible name for this simulation in a study-level chart
+ *
+ * @param {Simulation} sim simulation
+ * @param {{values:any[]}} axis an object with a values array
+ * @param {number} j The simulation's index in a study array
+ * @returns {string} suggested name
+ */
 function simName(sim,axis,j){
   return '' + (
       (axis && axis.values && axis.values[j]) ||
@@ -417,6 +652,11 @@ function simName(sim,axis,j){
 
 export const helpers = {
 
+  /**
+   * Helper for supply/demand chart
+   *
+   * @returns {Function} function from Simulation to [data,layout]
+   */
   supplyDemand() {
     return function (sim) {
       const demandValues = sim.config.buyerValues.slice().sort(function (a, b) { return +b - a; });
@@ -440,6 +680,13 @@ export const helpers = {
       const cutoff = Math.min(minlen+10,maxlen);
       const idxStep = Math.max(1,Math.ceil(minlen/50));
       const xD=[0],yD=[H+1],xS=[0],yS=[0];
+
+      /**
+       * Internal function to include points into supply/demand chart
+       *
+       * @param {number} i unit to include
+       * @returns {void}
+       */
       function include(i){
         if (i<0) return;
         if(i<demandValues.length){
@@ -466,7 +713,8 @@ export const helpers = {
           xS.push(i+1);
           yS.push(sCost);
         }
-      }
+      } // end internal function include
+
       let q0,q1;
       if (Array.isArray(ceModel.q)){
         [q0,q1] = ceModel.q;
@@ -529,6 +777,15 @@ export const helpers = {
 
   plotFactory,
 
+  /**
+   * Helper for Box Plots
+   *
+   * @param {object} chart chart options
+   * @param {string} chart.log name of a simulation log
+   * @param {string} chart.y a y-variable name from the log header
+   * @param {string} chart.input must be set to 'study'
+   * @returns {Function} function from (sims, axis) to Plotly [data,layout]
+   */
   boxplotFactory(chart) {
     // requires log, y, input='study'
     return function (sims, axis) {
@@ -563,9 +820,17 @@ export const helpers = {
     };
   },
 
+  /**
+   * Helper for Violin Plots
+   *
+   * @param {object} chart chart options
+   * @param {string} chart.log name of a simulation log
+   * @param {string} chart.y a y-variable name from the log header
+   * @param {string} chart.input must be set to 'study'
+   * @returns {Function} function from (sims, axis) to Plotly [data,layout]
+   */
   violinFactory(chart) {
     // requires log, y, input='study'
-
     return function (sims, axis) {
       if (!Array.isArray(sims))
         throw new Error("violin requires an array of multiple simulations");
@@ -601,12 +866,21 @@ export const helpers = {
     };
   },
 
+  /**
+   * Helper for Scatter Plots
+   *
+   * @param {object} chart chart options
+   * @param {string} chart.log name of a simulation log
+   * @param {string} chart.y a y-variable name from the log header
+   * @param {string} chart.input must be set to 'study'
+   * @returns {Function} function from (sims, axis) to Plotly [data,layout]
+   */
   scatterFactory(chart) {
     // requires log, y, input='study'
 
     return function (sims, axis) {
       if (!Array.isArray(sims))
-        throw new Error("violin requires an array of multiple simulations");
+        throw new Error("scatter requires an array of multiple simulations");
       let yMean=[],yStdev=[],x=[];
       sims.forEach((sim,j)=>{
         try {
@@ -653,6 +927,18 @@ export const helpers = {
     };
   },
 
+  /**
+   * Helper for Histograms
+   *
+   * @param {object} chart chart options
+   * @param {string} chart.title title
+   * @param {string[]} chart.names histogram names
+   * @param {string[]} chart.logs data source logs
+   * @param {string[]} chart.vars variables to use
+   * @param {number} chart.bins positive integer number of bins
+   * @oaram chart.range
+   * @returns {Function} function from Simulation to Plotly [traces,layout]
+   */
   histogramFactory(chart) {
 
     /* req chart properties are title, names, logs, vars */
@@ -690,14 +976,15 @@ export const helpers = {
           [mymin, mymax] = layout.xaxis.range;
       }
       if ((mymin===undefined) || (mymax===undefined)){
+        // npm:d3A.min and d3A.max are called below as min and max
         mymin = Math.floor(
-          d3A.min(traces, function (trace) {
-            return d3A.min(trace.x);
+          min(traces, function (trace) {
+            return min(trace.x);
           })
         );
         mymax = Math.ceil(
-          d3A.max(traces, function (trace) {
-            return d3A.max(trace.x);
+          max(traces, function (trace) {
+            return max(trace.x);
           })
         );
         if (mymax!==1) mymax += 1; // hack to include right limit in integer-valued x data
@@ -722,7 +1009,18 @@ export const helpers = {
     };
   },
 
-  histogram2DFactory(chart) {
+
+/**
+ * histogram2DFactory - create 2D Plotly histogram
+ *
+ * @param {object} chart options
+ * @param {string} chart.title title
+ * @param {string} chart.log log for data source
+ * @param {string[]} chart.names a 2-element array of names for x and y axis
+ * @param {string[]} chart.vars a 2-eleemnt array of log vars for x and y axis
+ * @returns {Function} function from Simulation to Plotly [traces,layout]
+ */
+histogram2DFactory(chart) {
 
     /* req chart properties are title, log, names[2], vars[2] */
 
@@ -834,7 +1132,12 @@ export const helpers = {
     };
   },
 
-
+  /**
+   * Create Profit Distribution Violin Chart
+   * @param {object} chart options
+   * @param {string} chart.title title
+   * @returns {Function} function from Simulation to Plotly [traces,layout]
+   */
   plotProfitDistributionViolin(chart){
     return function(sim){
         const extracted = extract(sim.logs.profit);
@@ -868,6 +1171,14 @@ export const helpers = {
     };
   },
 
+  /**
+   * Create a Profit Time Series chart
+   *
+   * @param {object} chart options
+   * @param {string} chart.title optional title
+   * @param {object} chart.layout optional layout to merge-override autogenerated layout
+   * @returns {Function} function from Simulation to Plotly [trace,layout]
+   */
   plotProfitTimeSeries(chart) {
     return function (sim) {
       const extracted = extract(sim.logs.profit);
@@ -901,6 +1212,15 @@ export const helpers = {
     };
   },
 
+  /**
+   * Create a Smart Plot of Agent Profits comparing simulations
+   *
+   * @param {object} chart options
+   * @param {string} chart.title title
+   * @param {object} chart.layout optional layout
+   * @param {number} chart.numberOfPlots optional number of agents to plot, default: 4
+   * @returns {Function} function from Simulations, axis to Plotly [traces,layout]
+   */
   smartPlotAgentProfits(chart){
     const numberOfPlots = +(chart.numberOfPlots) || 4;
     return function(sims, axis){
@@ -975,15 +1295,19 @@ export const helpers = {
       );
       return [traces, layout];
     };
-
   }
-
 };
 
-export function build(arrayOfVisuals) {
-  return arrayOfVisuals.map(function (spec) {
+/**
+ * Convert an array of chart specifications to an array of Visualization Factory
+ *
+ * @param {object[]} arrayOfCharts An array of chart objects to transform
+ * @returns {VisualizationFactory[]} The resulting Visualization Factories
+ */
+export function build(arrayOfCharts) {
+  return arrayOfCharts.map(function (chart) {
     try {
-      return new VisualizationFactory(spec);
+      return new VisualizationFactory(chart);
     } catch (e) {
       console.log(e); // eslint-disable-line no-console
       return undefined;
