@@ -16,7 +16,7 @@ import MaxMinDist from 'max-min-dist';
 /**
  * A Simulation as defined in npm:single-market-robot-simulator
  *
- * @typedef {{}} Simulation
+ * @typedef {object} Simulation
  */
 
 /**
@@ -127,9 +127,9 @@ export class PlotlyDataLayoutConfig {
   /**
    *
    * @param options Chart options
-   * @param {{}[]} options.data Data for the chart
-   * @param {{}} options.layout Layout for the chart
-   * @param {{}} options.config  Config for the chart
+   * @param {object[]} options.data Data for the chart
+   * @param {object} options.layout Layout for the chart
+   * @param {object} options.config  Config for the chart
    * @param {boolean} options.isInteractive true for interactive chart
    * @param {?{prepend: ?string, append: ?string, replace: ?string}} options.title Title modifiers
    */
@@ -189,7 +189,7 @@ export class PlotlyDataLayoutConfig {
  *
  * @param {Simulation} sim Simulation
  * @param {string} prefix Prefix; e.g. 'Buyer', 'Seller'
- * @returns {{}} extracted key/value configuration
+ * @returns {object} extracted key/value configuration
  */
 function extractNestedConfig(sim, prefix){
   const result = {};
@@ -270,7 +270,7 @@ export class VisualizationFactory  {
   }
 
   /**
-   * @param {{}} options options
+   * @param {object} options options
    * @param {Simulation[]|Simulation} options.from Data Input: A Simulation or an Array of Simulations
    * @param {string} options.to Chart Destination: A div name
    * @param {string} options.title Title at top of chart
@@ -323,7 +323,7 @@ const MT = Random.MersenneTwister19937.autoSeed();
 /**
  * set default Plotly layout
  *
- * @param {{}} layout A Plotly layout
+ * @param {object} layout A Plotly layout
  * @returns {void}
  */
 export function setDefaultLayout(layout) {
@@ -357,8 +357,8 @@ let logFilter = null;
 /**
  * set filter for data logs
  *
- * @param {{}} newFilter the filter
- * @returns {{}} filter
+ * @param {object} newFilter the filter
+ * @returns {object} filter
  */
 export function setFilter(newFilter){
   logFilter = newFilter;
@@ -368,7 +368,7 @@ export function setFilter(newFilter){
 /**
  * get filter for data logs
  *
- * @returns {{}} filter
+ * @returns {object} filter
  */
 export function getFilter(){
   return logFilter;
@@ -391,7 +391,7 @@ function sample(data) {
 /**
  * Filters and randomly samples data from log's data
  *
- * @param {{}} log A simulation log as defined in npm:single-market-robot-simulator
+ * @param {object} log A simulation log as defined in npm:single-market-robot-simulator
  * @returns {any[]} resulting data array
  */
 function extract(log){
@@ -503,7 +503,7 @@ function getLayout(options){
   /**
    * Helper to push xaxis objects to items
    *
-   * @param {{}} obj xaxis object
+   * @param {object} obj xaxis object
    * @returns {void}
    */
   function xaxis(obj){ if (obj) items.push({xaxis: obj}); }
@@ -511,7 +511,7 @@ function getLayout(options){
   /**
    * Helper to push yaxis objects to items
    *
-   * @param {{}} obj yaxis object
+   * @param {object} obj yaxis object
    * @returns {void}
    */
   function yaxis(obj){ if (obj) items.push({yaxis: obj}); }
