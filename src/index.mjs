@@ -126,7 +126,7 @@ export class PlotlyDataLayoutConfig {
 
   /**
    *
-   * @param options Chart options
+   * @param {object} options Chart options
    * @param {object[]} options.data Data for the chart
    * @param {object} options.layout Layout for the chart
    * @param {object} options.config  Config for the chart
