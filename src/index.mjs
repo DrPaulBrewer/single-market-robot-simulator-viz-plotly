@@ -125,28 +125,30 @@ function getAgentText(sim){
 export class PlotlyDataLayoutConfig {
 
   /**
-   *
+   * Class PlotlyDataLayoutConfig encapsulates the three primary Plotly plot structures data, layout, config
+   * along with a boolean for isInteractive
+   * 
    * @param {object} options Chart options
    * @param {object[]} options.data Data for the chart
    * @param {object} options.layout Layout for the chart
    * @param {object} options.config  Config for the chart
    * @param {boolean} options.isInteractive true for interactive chart
+   * @returns {PlotlyDataLayoutConfig} new PlotlyDataLayoutConfig
    */
-  constructor(options){
+  constructor(options) {
     this.data = options.data || [];
     this.layout = options.layout || {};
     this.config = options.config || {};
     this.setInteractivity(options.isInteractive);
-    }
   }
 
   /**
    * Set Plotly interactivity
    *
    * @param {boolean} isInteractive True for interactive chart
+   * @returns {boolean} updated setting of isInteractive
    */
-
-  setInteractivity(isInteractive=false){
+  setInteractivity(isInteractive = false) {
     const config = this.config;
     config.staticPlot = !isInteractive;
     config.displayModeBar = isInteractive;
@@ -159,6 +161,7 @@ export class PlotlyDataLayoutConfig {
  * Change Plotly plot title by prepending, appending, or replacing existing plot title
  *
  * @param {{prepend: ?string, append: ?string, replace: ?string}} adjustments adjustments to title
+ * @returns {PlotlyDataLayoutConfig} PlotlyDataLayoutConfig object
  */
   adjustTitle(adjustments){
     const {prepend, append, replace} = adjustments;
