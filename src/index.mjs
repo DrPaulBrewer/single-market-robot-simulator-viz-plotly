@@ -19,6 +19,80 @@ import MaxMinDist from 'max-min-dist';
  * @typedef {object} Simulation
  */
 
+let defaultLayout = {};
+
+const MT = Random.MersenneTwister19937.autoSeed();
+
+/**
+ * set default Plotly layout
+ *
+ * @param {object} layout A Plotly layout
+ * @returns {void}
+ */
+export function setDefaultLayout(layout) {
+  defaultLayout = clone(layout);
+}
+
+let sampleSize = +Infinity;
+
+/**
+ * set default Plot Sample Size
+ *
+ * @param {number} newsize sample size, 1 to +Infinity
+ * @returns {number} sample size
+ */
+export function setSampleSize(newsize) {
+  sampleSize = newsize;
+  return sampleSize;
+}
+
+/**
+ * get default Plot sample size
+ *
+ * @returns {number} sample size
+ */
+export function getSampleSize() {
+  return sampleSize;
+}
+
+let logFilter = null;
+
+/**
+ * set filter for data logs
+ *
+ * @param {object} newFilter the filter
+ * @returns {object} filter
+ */
+export function setFilter(newFilter){
+  logFilter = newFilter;
+  return logFilter;
+}
+
+/**
+ * get filter for data logs
+ *
+ * @returns {object} filter
+ */
+export function getFilter(){
+  return logFilter;
+}
+
+let screenWidth = 600;
+
+/**
+ * Set screen width
+ * Example: setScreenWidth(+window.screen.availWidth || +window.screen.width)
+ * This function exists to remove "window" dependencies from this module so that it could
+ * run in a worker or other contexts lacking window.
+ *
+ * @param {number} w screen width in pixels
+ * @returns {number} updated screen width
+ */
+export function setScreenWidth(w){
+  screenWidth = +w;
+  return screenWidth;
+}
+
 /**
  * Converts NaN to zero; preserves regular numbers
  *
@@ -70,11 +144,7 @@ function assertContiguousFiniteNumberArray(a){
  * @returns {string} primary or primary+secondary
  */
 function tickText(primary,secondary){
-    let width;
-    try {
-      width = +window.screen.availWidth || +window.screen.width;
-    } catch(e) {console.log(e);}
-    if (width && (width<500)) return primary;
+    if (screenWidth && (screenWidth<500)) return primary;
     return primary+'<br>'+secondary;
 }
 
@@ -127,7 +197,7 @@ export class PlotlyDataLayoutConfig {
   /**
    * Class PlotlyDataLayoutConfig encapsulates the three primary Plotly plot structures data, layout, config
    * along with a boolean for isInteractive
-   * 
+   *
    * @param {object} options Chart options
    * @param {object[]} options.data Data for the chart
    * @param {object} options.layout Layout for the chart
@@ -212,8 +282,7 @@ function extractNestedConfig(sim, prefix){
 export function displayPlotInDiv(plot, div){
   try {
     const lines = plot.layout.title.text.split('<br>');
-    const width = window.screen.availWidth || window.screen.width;
-    const charw = Math.floor(width/15); // 15 pixels per char is a guess
+    const charw = Math.floor(screenWidth/15); // 15 pixels per char is a guess
     const newlines = [];
     lines.forEach((line)=>{
       const words = line.split(' ');
@@ -315,63 +384,6 @@ export class VisualizationFactory  {
   }
 }
 
-let defaultLayout = {};
-
-const MT = Random.MersenneTwister19937.autoSeed();
-
-/**
- * set default Plotly layout
- *
- * @param {object} layout A Plotly layout
- * @returns {void}
- */
-export function setDefaultLayout(layout) {
-  defaultLayout = clone(layout);
-}
-
-let sampleSize = +Infinity;
-
-/**
- * set default Plot Sample Size
- *
- * @param {number} newsize sample size, 1 to +Infinity
- * @returns {number} sample size
- */
-export function setSampleSize(newsize) {
-  sampleSize = newsize;
-  return sampleSize;
-}
-
-/**
- * get default Plot sample size
- *
- * @returns {number} sample size
- */
-export function getSampleSize() {
-  return sampleSize;
-}
-
-let logFilter = null;
-
-/**
- * set filter for data logs
- *
- * @param {object} newFilter the filter
- * @returns {object} filter
- */
-export function setFilter(newFilter){
-  logFilter = newFilter;
-  return logFilter;
-}
-
-/**
- * get filter for data logs
- *
- * @returns {object} filter
- */
-export function getFilter(){
-  return logFilter;
-}
 
 /**
  * return a sample of data, preserving header row
@@ -447,7 +459,7 @@ function axisTitle(vs){
 }
 
 /**
- * Suggested Pdlotly axis range for chart variables
+ * Suggested Plotly axis range for chart variables
  *
  * @param {string|string[]} vs chart variables
  * @param {Simulation} sim Simulation
@@ -943,8 +955,6 @@ export const helpers = {
     /* req chart properties are title, names, logs, vars */
     /* opt chart properties are bins, range */
 
-    const width = window.screen.availWidth || window.screen.width || 300;
-
     return function (sim) {
       let traces = chart.names.map(function (name, i) {
         let mylog = chart.logs[i % chart.logs.length];
@@ -993,7 +1003,7 @@ export const helpers = {
       if (chart.bins){
         binsize = (mymax-mymin)/chart.bins;
       } else {
-        while(Math.ceil((mymax-mymin)/binsize)>(width/3)){
+        while(Math.ceil((mymax-mymin)/binsize)>(screenWidth/3)){
           binsize += 1;
         }
       }

@@ -47,6 +47,80 @@ import MaxMinDist from 'max-min-dist';
  * @typedef {object} Simulation
  */
 
+let defaultLayout = {};
+
+const MT = Random.MersenneTwister19937.autoSeed();
+
+/**
+ * set default Plotly layout
+ *
+ * @param {object} layout A Plotly layout
+ * @returns {void}
+ */
+export function setDefaultLayout(layout) {
+  defaultLayout = clone(layout);
+}
+
+let sampleSize = +Infinity;
+
+/**
+ * set default Plot Sample Size
+ *
+ * @param {number} newsize sample size, 1 to +Infinity
+ * @returns {number} sample size
+ */
+export function setSampleSize(newsize) {
+  sampleSize = newsize;
+  return sampleSize;
+}
+
+/**
+ * get default Plot sample size
+ *
+ * @returns {number} sample size
+ */
+export function getSampleSize() {
+  return sampleSize;
+}
+
+let logFilter = null;
+
+/**
+ * set filter for data logs
+ *
+ * @param {object} newFilter the filter
+ * @returns {object} filter
+ */
+export function setFilter(newFilter){
+  logFilter = newFilter;
+  return logFilter;
+}
+
+/**
+ * get filter for data logs
+ *
+ * @returns {object} filter
+ */
+export function getFilter(){
+  return logFilter;
+}
+
+let screenWidth = 600;
+
+/**
+ * Set screen width
+ * Example: setScreenWidth(+window.screen.availWidth || +window.screen.width)
+ * This function exists to remove "window" dependencies from this module so that it could
+ * run in a worker or other contexts lacking window.
+ *
+ * @param {number} w screen width in pixels
+ * @returns {number} updated screen width
+ */
+export function setScreenWidth(w){
+  screenWidth = +w;
+  return screenWidth;
+}
+
 /**
  * Converts NaN to zero; preserves regular numbers
  *
@@ -98,11 +172,7 @@ function assertContiguousFiniteNumberArray(a){
  * @returns {string} primary or primary+secondary
  */
 function tickText(primary,secondary){
-    let width;
-    try {
-      width = +window.screen.availWidth || +window.screen.width;
-    } catch(e) {console.log(e);}
-    if (width &amp;&amp; (width&lt;500)) return primary;
+    if (screenWidth &amp;&amp; (screenWidth&lt;500)) return primary;
     return primary+'&lt;br>'+secondary;
 }
 
@@ -153,31 +223,30 @@ function getAgentText(sim){
 export class PlotlyDataLayoutConfig {
 
   /**
+   * Class PlotlyDataLayoutConfig encapsulates the three primary Plotly plot structures data, layout, config
+   * along with a boolean for isInteractive
    *
    * @param {object} options Chart options
    * @param {object[]} options.data Data for the chart
    * @param {object} options.layout Layout for the chart
    * @param {object} options.config  Config for the chart
    * @param {boolean} options.isInteractive true for interactive chart
-   * @param {?{prepend: ?string, append: ?string, replace: ?string}} options.title Title modifiers
+   * @returns {PlotlyDataLayoutConfig} new PlotlyDataLayoutConfig
    */
-  constructor(options){
+  constructor(options) {
     this.data = options.data || [];
     this.layout = options.layout || {};
     this.config = options.config || {};
     this.setInteractivity(options.isInteractive);
-    if (options.title){
-      this.adjustTitle(options.title);
-    }
   }
 
   /**
    * Set Plotly interactivity
    *
    * @param {boolean} isInteractive True for interactive chart
+   * @returns {boolean} updated setting of isInteractive
    */
-
-  setInteractivity(isInteractive=false){
+  setInteractivity(isInteractive = false) {
     const config = this.config;
     config.staticPlot = !isInteractive;
     config.displayModeBar = isInteractive;
@@ -189,20 +258,21 @@ export class PlotlyDataLayoutConfig {
 /**
  * Change Plotly plot title by prepending, appending, or replacing existing plot title
  *
- * @param {{prepend: ?string, append: ?string, replace: ?string}} modifier modifications to title
+ * @param {{prepend: ?string, append: ?string, replace: ?string}} adjustments adjustments to title
+ * @returns {PlotlyDataLayoutConfig} PlotlyDataLayoutConfig object
  */
-
-  adjustTitle(modifier){
+  adjustTitle(adjustments){
+    const {prepend, append, replace} = adjustments;
     const layout = this.layout;
     if (!layout.title) layout.title = {};
-    if (modifier.replace &amp;&amp; (modifier.replace.length > 0)){
-      layout.title.text = modifier.replace;
+    if (typeof(replace)==='string' &amp;&amp; (replace.length > 0)){
+      layout.title.text = replace;
     }
     if (layout.title &amp;&amp; layout.title.text) {
-      if (modifier.prepend &amp;&amp; (modifier.prepend.length > 0))
-        layout.title.text = modifier.prepend + '&lt;br>' +layout.title;
-      if (modifier.append &amp;&amp; (modifier.append.length > 0))
-        layout.title.text += '&lt;br>' + modifier.append;
+      if (typeof(prepend)==='string' &amp;&amp; (prepend.length > 0))
+        layout.title.text = prepend + '&lt;br>' +layout.title.text;
+      if (typeof(append)==='string' &amp;&amp; (append.length > 0))
+        layout.title.text += '&lt;br>' + append;
     }
     return this;
   }
@@ -240,8 +310,7 @@ function extractNestedConfig(sim, prefix){
 export function displayPlotInDiv(plot, div){
   try {
     const lines = plot.layout.title.text.split('&lt;br>');
-    const width = window.screen.availWidth || window.screen.width;
-    const charw = Math.floor(width/15); // 15 pixels per char is a guess
+    const charw = Math.floor(screenWidth/15); // 15 pixels per char is a guess
     const newlines = [];
     lines.forEach((line)=>{
       const words = line.split(' ');
@@ -343,63 +412,6 @@ export class VisualizationFactory  {
   }
 }
 
-let defaultLayout = {};
-
-const MT = Random.MersenneTwister19937.autoSeed();
-
-/**
- * set default Plotly layout
- *
- * @param {object} layout A Plotly layout
- * @returns {void}
- */
-export function setDefaultLayout(layout) {
-  defaultLayout = clone(layout);
-}
-
-let sampleSize = +Infinity;
-
-/**
- * set default Plot Sample Size
- *
- * @param {number} newsize sample size, 1 to +Infinity
- * @returns {number} sample size
- */
-export function setSampleSize(newsize) {
-  sampleSize = newsize;
-  return sampleSize;
-}
-
-/**
- * get default Plot sample size
- *
- * @returns {number} sample size
- */
-export function getSampleSize() {
-  return sampleSize;
-}
-
-let logFilter = null;
-
-/**
- * set filter for data logs
- *
- * @param {object} newFilter the filter
- * @returns {object} filter
- */
-export function setFilter(newFilter){
-  logFilter = newFilter;
-  return logFilter;
-}
-
-/**
- * get filter for data logs
- *
- * @returns {object} filter
- */
-export function getFilter(){
-  return logFilter;
-}
 
 /**
  * return a sample of data, preserving header row
@@ -475,7 +487,7 @@ function axisTitle(vs){
 }
 
 /**
- * Suggested Pdlotly axis range for chart variables
+ * Suggested Plotly axis range for chart variables
  *
  * @param {string|string[]} vs chart variables
  * @param {Simulation} sim Simulation
@@ -971,8 +983,6 @@ export const helpers = {
     /* req chart properties are title, names, logs, vars */
     /* opt chart properties are bins, range */
 
-    const width = window.screen.availWidth || window.screen.width || 300;
-
     return function (sim) {
       let traces = chart.names.map(function (name, i) {
         let mylog = chart.logs[i % chart.logs.length];
@@ -1021,7 +1031,7 @@ export const helpers = {
       if (chart.bins){
         binsize = (mymax-mymin)/chart.bins;
       } else {
-        while(Math.ceil((mymax-mymin)/binsize)>(width/3)){
+        while(Math.ceil((mymax-mymin)/binsize)>(screenWidth/3)){
           binsize += 1;
         }
       }
@@ -1351,13 +1361,13 @@ export function build(arrayOfCharts) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a></li><li><a href="VisualizationFactory.html">VisualizationFactory</a></li></ul><h3>Global</h3><ul><li><a href="global.html#annotation">annotation</a></li><li><a href="global.html#assertContiguousFiniteNumberArray">assertContiguousFiniteNumberArray</a></li><li><a href="global.html#axisRange">axisRange</a></li><li><a href="global.html#axisTitle">axisTitle</a></li><li><a href="global.html#build">build</a></li><li><a href="global.html#competitiveEquilibriumModel">competitiveEquilibriumModel</a></li><li><a href="global.html#displayPlotInDiv">displayPlotInDiv</a></li><li><a href="global.html#extract">extract</a></li><li><a href="global.html#extractNestedConfig">extractNestedConfig</a></li><li><a href="global.html#getAgentColors">getAgentColors</a></li><li><a href="global.html#getAgentText">getAgentText</a></li><li><a href="global.html#getFilter">getFilter</a></li><li><a href="global.html#getLayout">getLayout</a></li><li><a href="global.html#getSampleSize">getSampleSize</a></li><li><a href="global.html#hasAnyKeyword">hasAnyKeyword</a></li><li><a href="global.html#hasPriceVars">hasPriceVars</a></li><li><a href="global.html#isContiguousFiniteNumberArray">isContiguousFiniteNumberArray</a></li><li><a href="global.html#numberedStringArray">numberedStringArray</a></li><li><a href="global.html#plotFactory">plotFactory</a></li><li><a href="global.html#sample">sample</a></li><li><a href="global.html#setDefaultLayout">setDefaultLayout</a></li><li><a href="global.html#setFilter">setFilter</a></li><li><a href="global.html#setSampleSize">setSampleSize</a></li><li><a href="global.html#simName">simName</a></li><li><a href="global.html#tickText">tickText</a></li><li><a href="global.html#toNumberOrZero">toNumberOrZero</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a></li><li><a href="VisualizationFactory.html">VisualizationFactory</a></li></ul><h3>Global</h3><ul><li><a href="global.html#annotation">annotation</a></li><li><a href="global.html#assertContiguousFiniteNumberArray">assertContiguousFiniteNumberArray</a></li><li><a href="global.html#axisRange">axisRange</a></li><li><a href="global.html#axisTitle">axisTitle</a></li><li><a href="global.html#build">build</a></li><li><a href="global.html#competitiveEquilibriumModel">competitiveEquilibriumModel</a></li><li><a href="global.html#displayPlotInDiv">displayPlotInDiv</a></li><li><a href="global.html#extract">extract</a></li><li><a href="global.html#extractNestedConfig">extractNestedConfig</a></li><li><a href="global.html#getAgentColors">getAgentColors</a></li><li><a href="global.html#getAgentText">getAgentText</a></li><li><a href="global.html#getFilter">getFilter</a></li><li><a href="global.html#getLayout">getLayout</a></li><li><a href="global.html#getSampleSize">getSampleSize</a></li><li><a href="global.html#hasAnyKeyword">hasAnyKeyword</a></li><li><a href="global.html#hasPriceVars">hasPriceVars</a></li><li><a href="global.html#isContiguousFiniteNumberArray">isContiguousFiniteNumberArray</a></li><li><a href="global.html#numberedStringArray">numberedStringArray</a></li><li><a href="global.html#plotFactory">plotFactory</a></li><li><a href="global.html#sample">sample</a></li><li><a href="global.html#setDefaultLayout">setDefaultLayout</a></li><li><a href="global.html#setFilter">setFilter</a></li><li><a href="global.html#setSampleSize">setSampleSize</a></li><li><a href="global.html#setScreenWidth">setScreenWidth</a></li><li><a href="global.html#simName">simName</a></li><li><a href="global.html#tickText">tickText</a></li><li><a href="global.html#toNumberOrZero">toNumberOrZero</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Fri May 20 2022 02:34:32 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Fri May 20 2022 03:29:46 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

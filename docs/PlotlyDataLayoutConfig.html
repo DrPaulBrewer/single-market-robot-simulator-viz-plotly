@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>PlotlyDataLayoutConfig<span class="signature">(options)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>PlotlyDataLayoutConfig<span class="signature">(options)</span><span class="type-signature"> &rarr; {<a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a>}</span></h2>
         
             <div class="class-description">Class to encapsulate data, layout, and config parameters of Plotly plots</div>
         
@@ -45,12 +45,17 @@
     
 
     
-    <h4 class="name" id="PlotlyDataLayoutConfig"><span class="type-signature"></span>new PlotlyDataLayoutConfig<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="PlotlyDataLayoutConfig"><span class="type-signature"></span>new PlotlyDataLayoutConfig<span class="signature">(options)</span><span class="type-signature"> &rarr; {<a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a>}</span></h4>
     
 
     
 
 
+
+<div class="description">
+    Class PlotlyDataLayoutConfig encapsulates the three primary Plotly plot structures data, layout, config
+along with a boolean for isInteractive
+</div>
 
 
 
@@ -115,8 +120,6 @@
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -142,14 +145,6 @@
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
@@ -172,14 +167,6 @@
             
             </td>
 
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
             
 
             
@@ -204,14 +191,6 @@
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
@@ -235,51 +214,10 @@
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
             <td class="description last">true for interactive chart</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>title</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-                    &lt;nullable><br>
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Title modifiers</td>
         </tr>
 
     
@@ -327,7 +265,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.mjs.html">index.mjs</a>, <a href="index.mjs.html#line125">line 125</a>
+        <a href="index.mjs.html">index.mjs</a>, <a href="index.mjs.html#line195">line 195</a>
     </li></ul></dd>
     
 
@@ -352,6 +290,28 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    new PlotlyDataLayoutConfig
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -390,7 +350,7 @@
     
 
     
-    <h4 class="name" id="adjustTitle"><span class="type-signature"></span>adjustTitle<span class="signature">(modifier)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="adjustTitle"><span class="type-signature"></span>adjustTitle<span class="signature">(adjustments)</span><span class="type-signature"> &rarr; {<a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a>}</span></h4>
     
 
     
@@ -434,7 +394,7 @@
 
         <tr>
             
-                <td class="name"><code>modifier</code></td>
+                <td class="name"><code>adjustments</code></td>
             
 
             <td class="type">
@@ -450,7 +410,7 @@
 
             
 
-            <td class="description last">modifications to title</td>
+            <td class="description last">adjustments to title</td>
         </tr>
 
     
@@ -491,7 +451,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.mjs.html">index.mjs</a>, <a href="index.mjs.html#line167">line 167</a>
+        <a href="index.mjs.html">index.mjs</a>, <a href="index.mjs.html#line236">line 236</a>
     </li></ul></dd>
     
 
@@ -516,6 +476,28 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    PlotlyDataLayoutConfig object
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -527,7 +509,7 @@
     
 
     
-    <h4 class="name" id="setInteractivity"><span class="type-signature"></span>setInteractivity<span class="signature">(isInteractive)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setInteractivity"><span class="type-signature"></span>setInteractivity<span class="signature">(isInteractive)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
 
     
@@ -636,7 +618,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.mjs.html">index.mjs</a>, <a href="index.mjs.html#line152">line 152</a>
+        <a href="index.mjs.html">index.mjs</a>, <a href="index.mjs.html#line221">line 221</a>
     </li></ul></dd>
     
 
@@ -661,6 +643,28 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    updated setting of isInteractive
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -682,13 +686,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a></li><li><a href="VisualizationFactory.html">VisualizationFactory</a></li></ul><h3>Global</h3><ul><li><a href="global.html#annotation">annotation</a></li><li><a href="global.html#assertContiguousFiniteNumberArray">assertContiguousFiniteNumberArray</a></li><li><a href="global.html#axisRange">axisRange</a></li><li><a href="global.html#axisTitle">axisTitle</a></li><li><a href="global.html#build">build</a></li><li><a href="global.html#competitiveEquilibriumModel">competitiveEquilibriumModel</a></li><li><a href="global.html#displayPlotInDiv">displayPlotInDiv</a></li><li><a href="global.html#extract">extract</a></li><li><a href="global.html#extractNestedConfig">extractNestedConfig</a></li><li><a href="global.html#getAgentColors">getAgentColors</a></li><li><a href="global.html#getAgentText">getAgentText</a></li><li><a href="global.html#getFilter">getFilter</a></li><li><a href="global.html#getLayout">getLayout</a></li><li><a href="global.html#getSampleSize">getSampleSize</a></li><li><a href="global.html#hasAnyKeyword">hasAnyKeyword</a></li><li><a href="global.html#hasPriceVars">hasPriceVars</a></li><li><a href="global.html#isContiguousFiniteNumberArray">isContiguousFiniteNumberArray</a></li><li><a href="global.html#numberedStringArray">numberedStringArray</a></li><li><a href="global.html#plotFactory">plotFactory</a></li><li><a href="global.html#sample">sample</a></li><li><a href="global.html#setDefaultLayout">setDefaultLayout</a></li><li><a href="global.html#setFilter">setFilter</a></li><li><a href="global.html#setSampleSize">setSampleSize</a></li><li><a href="global.html#simName">simName</a></li><li><a href="global.html#tickText">tickText</a></li><li><a href="global.html#toNumberOrZero">toNumberOrZero</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a></li><li><a href="VisualizationFactory.html">VisualizationFactory</a></li></ul><h3>Global</h3><ul><li><a href="global.html#annotation">annotation</a></li><li><a href="global.html#assertContiguousFiniteNumberArray">assertContiguousFiniteNumberArray</a></li><li><a href="global.html#axisRange">axisRange</a></li><li><a href="global.html#axisTitle">axisTitle</a></li><li><a href="global.html#build">build</a></li><li><a href="global.html#competitiveEquilibriumModel">competitiveEquilibriumModel</a></li><li><a href="global.html#displayPlotInDiv">displayPlotInDiv</a></li><li><a href="global.html#extract">extract</a></li><li><a href="global.html#extractNestedConfig">extractNestedConfig</a></li><li><a href="global.html#getAgentColors">getAgentColors</a></li><li><a href="global.html#getAgentText">getAgentText</a></li><li><a href="global.html#getFilter">getFilter</a></li><li><a href="global.html#getLayout">getLayout</a></li><li><a href="global.html#getSampleSize">getSampleSize</a></li><li><a href="global.html#hasAnyKeyword">hasAnyKeyword</a></li><li><a href="global.html#hasPriceVars">hasPriceVars</a></li><li><a href="global.html#isContiguousFiniteNumberArray">isContiguousFiniteNumberArray</a></li><li><a href="global.html#numberedStringArray">numberedStringArray</a></li><li><a href="global.html#plotFactory">plotFactory</a></li><li><a href="global.html#sample">sample</a></li><li><a href="global.html#setDefaultLayout">setDefaultLayout</a></li><li><a href="global.html#setFilter">setFilter</a></li><li><a href="global.html#setSampleSize">setSampleSize</a></li><li><a href="global.html#setScreenWidth">setScreenWidth</a></li><li><a href="global.html#simName">simName</a></li><li><a href="global.html#tickText">tickText</a></li><li><a href="global.html#toNumberOrZero">toNumberOrZero</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Fri May 20 2022 02:34:32 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Fri May 20 2022 03:29:46 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
