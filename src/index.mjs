@@ -133,7 +133,6 @@ export class PlotlyDataLayoutConfig {
    * @param {boolean} options.isInteractive true for interactive chart
    * @param {?{prepend: ?string, append: ?string, replace: ?string}} options.title Title modifiers
    */
-
   constructor(options){
     this.data = options.data || [];
     this.layout = options.layout || {};

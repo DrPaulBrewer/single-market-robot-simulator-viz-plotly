@@ -8,3 +8,4 @@ example*.js
 *lcov
 docs
 out
+.idea
