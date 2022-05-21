@@ -341,7 +341,7 @@ export class VisualizationFactory  {
    * @param {object} options options
    * @param {Simulation[]|Simulation} options.from Data Input: A Simulation or an Array of Simulations
    * @param {string} options.to Chart Destination: A div name
-   * @param {string} options.title Title at top of chart
+   * @param {object} options.title title modifiers replace,append,preprend
    * @param {boolean} options.isInteractive True for interactive chart
    * @param {any} options.axis Helper specific
    * @returns {PlotlyDataLayoutConfig|PlotlyDataLayoutConfig[]} Populated/plotted visualization
