@@ -13,7 +13,7 @@ module.exports = {
     },
     "overrides": [
         {
-            "files": ["src/*.js"],
+            "files": ["src/*.mjs"],
             "extends": ["eslint:recommended", "plugin:jsdoc/recommended"]
         }
     ],

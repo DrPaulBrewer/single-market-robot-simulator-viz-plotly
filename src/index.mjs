@@ -947,7 +947,7 @@ export const helpers = {
    * @param {string[]} chart.logs data source logs
    * @param {string[]} chart.vars variables to use
    * @param {number} chart.bins positive integer number of bins
-   * @oaram chart.range
+   * @param {number[]} chart.range range for plotting [xlow,xhigh]
    * @returns {Function} function from Simulation to Plotly [traces,layout]
    */
   histogramFactory(chart) {
@@ -1143,6 +1143,7 @@ histogram2DFactory(chart) {
 
   /**
    * Create Profit Distribution Violin Chart
+   *
    * @param {object} chart options
    * @param {string} chart.title title
    * @returns {Function} function from Simulation to Plotly [traces,layout]
