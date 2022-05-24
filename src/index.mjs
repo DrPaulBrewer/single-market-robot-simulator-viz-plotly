@@ -1,6 +1,6 @@
 /* global Plotly: true */
 /* eslint consistent-this: ["error", "app", "that"] */
-/* eslint no-console: "off" */
+/* eslint jsdoc/require-property: "off" */
 // noinspection JSUnusedGlobalSymbols,ExceptionCaughtLocallyJS
 
 import {min,max} from 'd3-array';
@@ -526,12 +526,12 @@ function getLayout(options){
    * @returns {void}
    */
   function yaxis(obj){ if (obj) items.push({yaxis: obj}); }
-  const {caseid, tag} = sim.config;
+  const {caseid, tag} = sim?.config || {};
   items.push({ title: { text: (title || '')+annotation({caseid,tag}) } });
   if (axis){
     xaxis(axisTitle(axis.key));
   } else if (Array.isArray(sims)) {
-    if (sims && sims[0] && sims[0].config.tag){
+    if (sims[0]?.config?.tag){
       xaxis({title: 'tag'});
     } else {
       xaxis({title: 'case id'});
