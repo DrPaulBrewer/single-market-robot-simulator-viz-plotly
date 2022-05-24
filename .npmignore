@@ -1,0 +1,11 @@
+node_modules
+coverage
+*.csv
+example*.csv
+example*.js
+*~
+.nyc_output
+*lcov
+docs
+out
+.idea

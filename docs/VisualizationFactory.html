@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: VisualizationFactory</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: VisualizationFactory</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>VisualizationFactory<span class="signature">(chart)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Factory class that can build visualizations from a specification and data</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="VisualizationFactory"><span class="type-signature"></span>new VisualizationFactory<span class="signature">(chart)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create a VisualizationFactory
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>chart</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Specifications (see individual helperers for specific chart object)
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>f</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">function name within helpers</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.mjs.html">index.mjs</a>, <a href="index.mjs.html#line318">line 318</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="VisualizationFactory.html">VisualizationFactory</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="load"><span class="type-signature"></span>load<span class="signature">(options)</span><span class="type-signature"> &rarr; {<a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a>|Array.&lt;<a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a>>}</span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">options
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>from</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="global.html#Simulation">Simulation</a>></span>
+|
+
+<span class="param-type"><a href="global.html#Simulation">Simulation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Data Input: A Simulation or an Array of Simulations</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>to</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Chart Destination: A div name</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>title</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">title modifiers replace,append,preprend</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isInteractive</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">True for interactive chart</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>axis</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">any</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Helper specific</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.mjs.html">index.mjs</a>, <a href="index.mjs.html#line349">line 349</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Populated/plotted visualization
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a></span>
+|
+
+<span class="param-type">Array.&lt;<a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="PlotlyDataLayoutConfig.html">PlotlyDataLayoutConfig</a></li><li><a href="VisualizationFactory.html">VisualizationFactory</a></li></ul><h3>Global</h3><ul><li><a href="global.html#annotation">annotation</a></li><li><a href="global.html#assertContiguousFiniteNumberArray">assertContiguousFiniteNumberArray</a></li><li><a href="global.html#axisRange">axisRange</a></li><li><a href="global.html#axisTitle">axisTitle</a></li><li><a href="global.html#build">build</a></li><li><a href="global.html#competitiveEquilibriumModel">competitiveEquilibriumModel</a></li><li><a href="global.html#displayPlotInDiv">displayPlotInDiv</a></li><li><a href="global.html#extract">extract</a></li><li><a href="global.html#extractNestedConfig">extractNestedConfig</a></li><li><a href="global.html#getAgentColors">getAgentColors</a></li><li><a href="global.html#getAgentText">getAgentText</a></li><li><a href="global.html#getFilter">getFilter</a></li><li><a href="global.html#getLayout">getLayout</a></li><li><a href="global.html#getSampleSize">getSampleSize</a></li><li><a href="global.html#hasAnyKeyword">hasAnyKeyword</a></li><li><a href="global.html#hasPriceVars">hasPriceVars</a></li><li><a href="global.html#isContiguousFiniteNumberArray">isContiguousFiniteNumberArray</a></li><li><a href="global.html#numberedStringArray">numberedStringArray</a></li><li><a href="global.html#plotFactory">plotFactory</a></li><li><a href="global.html#sample">sample</a></li><li><a href="global.html#setDefaultLayout">setDefaultLayout</a></li><li><a href="global.html#setFilter">setFilter</a></li><li><a href="global.html#setSampleSize">setSampleSize</a></li><li><a href="global.html#setScreenWidth">setScreenWidth</a></li><li><a href="global.html#simName">simName</a></li><li><a href="global.html#tickText">tickText</a></li><li><a href="global.html#toNumberOrZero">toNumberOrZero</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Tue May 24 2022 18:50:29 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

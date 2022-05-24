@@ -1,16 +1,21 @@
 /* eslint-env node, mocha */
 /* eslint no-console: "off", newline-per-chained-call: "off" */
 
-import '@babel/polyfill';
 import assert from 'assert';
 import 'should';
-import * as VIZ from '../src/index.js';
+import * as VIZ from '../src/index.mjs';
 import * as singleMarketRobotSimulator from 'single-market-robot-simulator';
-import config1 from './sim1.json';
-import config2 from './sim2.json';
-import config3 from './sim3.json';
-import config4 from './sim4.json';
-import dataVisuals from './dataVisuals.json';
+import fs from 'fs';
+
+function readJSON(fname){
+  return JSON.parse(fs.readFileSync('./test/'+fname)); // eslint-disable-line no-sync
+}
+
+const config1 = readJSON('sim1.json');
+const config2 = readJSON('sim2.json');
+const config3 = readJSON('sim3.json');
+const config4 = readJSON('sim4.json');
+const dataVisuals = readJSON('dataVisuals.json');
 
 const { Simulation } = singleMarketRobotSimulator;
 
@@ -52,7 +57,7 @@ describe('visualizations', function(){
   it('should run each visualization OK on [sim1,sim2,sim3,sim4] with minimal sanity checking of output', function(){
     function testSingleLoadedViz(v, vl, j){
       const id = ` ${JSON.stringify(v.meta,null,2)} sim${(j+1)}`;
-      assert(vl instanceof VIZ.Visualization,"assert: vl is a VIZ.Visualization for "+id);
+      assert(vl instanceof VIZ.PlotlyDataLayoutConfig,"assert: vl is a VIZ.Visualization for "+id);
       assert(Array.isArray(vl.data),"assert vl.data is an array for "+id);
       vl.data.forEach((d)=>{
         if (d.x){
