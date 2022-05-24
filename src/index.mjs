@@ -240,7 +240,7 @@ export class PlotlyDataLayoutConfig {
     if (typeof(replace)==='string' && (replace.length > 0)){
       layout.title.text = replace;
     }
-    if (layout.title && layout.title.text) {
+    if (layout?.title?.text) {
       if (typeof(prepend)==='string' && (prepend.length > 0))
         layout.title.text = prepend + '<br>' +layout.title.text;
       if (typeof(append)==='string' && (append.length > 0))
@@ -262,7 +262,7 @@ export class PlotlyDataLayoutConfig {
  */
 function extractNestedConfig(sim, prefix){
   const result = {};
-  if (sim && sim.config){
+  if (sim?.config){
     const titleKeys = Object.keys(sim.config).filter((k)=>(k.startsWith(prefix)));
     titleKeys.forEach((k)=>{
       const withoutStarter = k.slice(prefix.length);
@@ -375,7 +375,7 @@ export class VisualizationFactory  {
     v.setInteractivity(isInteractive);
     if (title){
       v.adjustTitle(title);
-    } else if (from && from.config){
+    } else if (from?.config){
       const simTitleModifier = extractNestedConfig(from, 'title');
       v.adjustTitle(simTitleModifier);
     }
@@ -467,7 +467,7 @@ function axisTitle(vs){
  */
 function axisRange(vs, sim){
     if (hasPriceVars(vs)){
-      const h = sim && sim.config && sim.config.H;
+      const h = sim?.config?.H;
       return (h && {range: [0,+h]});
     }
     if (hasAnyKeyword(vs,['efficiency'])){
@@ -526,8 +526,7 @@ function getLayout(options){
    * @returns {void}
    */
   function yaxis(obj){ if (obj) items.push({yaxis: obj}); }
-  const caseid = sim && sim.config && sim.config.caseid;
-  const tag = sim && sim.config && sim.config.tag;
+  const {caseid, tag} = sim.config;
   items.push({ title: { text: (title || '')+annotation({caseid,tag}) } });
   if (axis){
     xaxis(axisTitle(axis.key));
@@ -649,7 +648,7 @@ export function competitiveEquilibriumModel(scenario){
  */
 function simName(sim,axis,j){
   return '' + (
-      (axis && axis.values && axis.values[j]) ||
+      (Array.isArray(axis?.values) && axis.values[j]) ||
       sim.config.tag ||
       sim.config.caseid ||
       j
@@ -981,7 +980,7 @@ export const helpers = {
         {barmode: 'overlay'}
       );
       let mymin, mymax;
-      if (layout && layout.xaxis && (layout.xaxis.range)){
+      if (layout?.xaxis?.range){
           [mymin, mymax] = layout.xaxis.range;
       }
       if ((mymin===undefined) || (mymax===undefined)){
